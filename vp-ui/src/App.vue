@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+// import TheWelcome from './components/TheWelcome.vue'
+import UploadItem from './components/UploadItem.vue'
 </script>
 
 <template>
@@ -12,9 +13,7 @@ import TheWelcome from './components/TheWelcome.vue'
     </div>
   </header>
 
-  <main>
-    <TheWelcome />
-  </main>
+  <main><UploadItem /></main>
 </template>
 
 <style scoped>
