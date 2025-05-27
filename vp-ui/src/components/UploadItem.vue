@@ -2,7 +2,7 @@
 import { UploadFilled } from '@element-plus/icons-vue'
 import OSS from 'ali-oss'
 import axios from 'axios'
-// import path from 'path'
+
 class OSSClientManager {
   private static instance: OSSClientManager
   private client: OSS | null = null
@@ -30,6 +30,7 @@ class OSSClientManager {
       accessKeyId: token.credentials.accessKeyId,
       accessKeySecret: token.credentials.accessKeySecret,
       stsToken: token.credentials.securityToken,
+      // @ts-expect-error idk
       authorizationV4: true,
       bucket: this.bucket,
       // 自动刷新临时访问凭证
@@ -46,15 +47,10 @@ class OSSClientManager {
   }
 
   // 上传文件方法
-  public async uploadFile(fileName: string, file: File, headers: JSON) {
+  public async uploadFile(fileName: string, file: File) {
     try {
       const client = await this.getClient()
-      let result
-      if (headers) {
-        result = await client.put(fileName, file, { headers })
-      } else {
-        result = await client.put(fileName, file)
-      }
+      const result = await client.put(fileName, file, { headers })
       console.log('上传成功:', result)
     } catch (error) {
       console.error('上传失败:', error)
@@ -93,12 +89,7 @@ async function put(options: JSON) {
     // console.log(file)
     const fileName = '/vp/source/' + file.name
     // console.log(fileName)
-    await OSSClientManager.getInstance().uploadFile(
-      fileName,
-      file,
-      // 自定义headers
-      headers,
-    )
+    await OSSClientManager.getInstance().uploadFile(fileName, file)
     // console.log(result)
   } catch (e) {
     console.log(e)
