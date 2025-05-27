@@ -1,20 +1,74 @@
 <script setup lang="ts">
 import { UploadFilled } from '@element-plus/icons-vue'
 import OSS from 'ali-oss'
+import axios from 'axios'
 // import path from 'path'
+class OSSClientManager {
+  private static instance: OSSClientManager
+  private client: OSS | null = null
+  private region = 'oss-cn-beijing'
+  private bucket = 'xiaoming10086'
+  private stsEndpoint = 'http://localhost:8080/api/sts'
 
-const client = new OSS({
-  // Bucket所在地域
-  region: 'oss-cn-beijing',
-  // 从环境变量中获取访问凭证。运行本代码示例之前，请确保已设置环境变量OSS_ACCESS_KEY_ID和OSS_ACCESS_KEY_SECRET。
-  accessKeyId: 'LTAI5tB4d28uuvgGdurjUdrt',
-  accessKeySecret: 'R4yg60Am1iQ8lxqoWYc8kCqZ7RDVa2',
-  // @ts-expect-error idk
-  authorizationV4: true,
-  // 填写Bucket名称。
-  secure: true,
-  bucket: 'xiaoming10086',
-})
+  // 单例模式，确保全局只有一个client实例
+  public static getInstance(): OSSClientManager {
+    if (!OSSClientManager.instance) {
+      OSSClientManager.instance = new OSSClientManager()
+    }
+    return OSSClientManager.instance
+  }
+
+  // 初始化或获取已有的client
+  public async getClient(): Promise<OSS> {
+    if (this.client) {
+      return this.client
+    }
+
+    const token = await this.fetchSTSToken()
+    this.client = new OSS({
+      region: this.region,
+      accessKeyId: token.credentials.accessKeyId,
+      accessKeySecret: token.credentials.accessKeySecret,
+      stsToken: token.credentials.securityToken,
+      authorizationV4: true,
+      bucket: this.bucket,
+      // 自动刷新临时访问凭证
+      refreshSTSToken: async () => {
+        const refreshedToken = await this.fetchSTSToken()
+        return {
+          accessKeyId: refreshedToken.credentials.accessKeyId,
+          accessKeySecret: refreshedToken.credentials.accessKeySecret,
+          stsToken: refreshedToken.credentials.securityToken,
+        }
+      },
+    })
+    return this.client
+  }
+
+  // 上传文件方法
+  public async uploadFile(fileName: string, file: File, headers: JSON) {
+    try {
+      const client = await this.getClient()
+      let result
+      if (headers) {
+        result = await client.put(fileName, file, { headers })
+      } else {
+        result = await client.put(fileName, file)
+      }
+      console.log('上传成功:', result)
+    } catch (error) {
+      console.error('上传失败:', error)
+      throw error
+    }
+  }
+
+  // 获取STS令牌
+  private async fetchSTSToken() {
+    const response = await axios.get(this.stsEndpoint)
+    // console.log(response)
+    return response.data.data
+  }
+}
 
 // 自定义请求头
 const headers = {
@@ -37,15 +91,15 @@ async function put(options: JSON) {
     // @ts-expect-error it dose
     const file = options.file
     // console.log(file)
-    const fileName = '/vp/' + file.name
+    const fileName = '/vp/source/' + file.name
     // console.log(fileName)
-    const result = await client.put(
+    await OSSClientManager.getInstance().uploadFile(
       fileName,
       file,
       // 自定义headers
-      { headers },
+      headers,
     )
-    console.log(result)
+    // console.log(result)
   } catch (e) {
     console.log(e)
   }

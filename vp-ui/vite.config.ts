@@ -37,12 +37,5 @@ export default defineConfig({
       ],
     }),
   ],
-  define: {
-    'oss.env': {
-      OSS_REGION: JSON.stringify(process.env.OSS_REGION),
-      OSS_ACCESS_KEY_ID: JSON.stringify(process.env.OSS_ACCESS_KEY_ID),
-      OSS_ACCESS_KEY_SECRET: JSON.stringify(process.env.OSS_ACCESS_KEY_SECRET),
-      OSS_BUCKET_NAME: JSON.stringify(process.env.OSS_BUCKET_NAME),
-    },
-  },
+  define: {},
 })
