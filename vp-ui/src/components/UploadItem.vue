@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { UploadFilled } from '@element-plus/icons-vue'
 import OSS from 'ali-oss'
-import path from 'path'
+// import path from 'path'
 
 const client = new OSS({
   // Bucket所在地域
@@ -34,6 +34,7 @@ async function put(options: JSON) {
   try {
     // 填写OSS文件完整路径和本地文件的完整路径。OSS文件完整路径中不能包含Bucket名称。
     // 如果本地文件的完整路径中未指定本地路径，则默认从示例程序所属项目对应本地路径中上传文件。
+    // @ts-expect-error it dose
     const file = options.file
     // console.log(file)
     const fileName = '/vp/' + file.name
@@ -55,8 +56,9 @@ async function put(options: JSON) {
   <el-upload class="upload" drag action="#" :http-request="put" auto-upload>
     <el-icon class="el-icon--upload"><upload-filled /></el-icon>
     <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+    <div class="el-upload__text">最大文件大小2GB</div>
     <template #tip>
-      <div class="el-upload__tip">jpg/png files with a size less than 500kb</div>
+      <div class="el-upload__tip">最大文件大小2GB</div>
     </template>
   </el-upload>
 </template>
