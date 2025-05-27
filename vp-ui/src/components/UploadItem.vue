@@ -102,8 +102,5 @@ async function put(options: JSON) {
     <el-icon class="el-icon--upload"><upload-filled /></el-icon>
     <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
     <div class="el-upload__text">最大文件大小2GB</div>
-    <template #tip>
-      <div class="el-upload__tip">最大文件大小2GB</div>
-    </template>
   </el-upload>
 </template>
