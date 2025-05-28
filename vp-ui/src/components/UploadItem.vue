@@ -2,6 +2,11 @@
 import { UploadFilled } from '@element-plus/icons-vue'
 import OSS from 'ali-oss'
 import axios from 'axios'
+import { ref } from 'vue'
+
+const uploadPercentage = ref(0)
+const showProgress = ref(false)
+let abortCheckpoint = null
 
 class OSSClientManager {
   private static instance: OSSClientManager
@@ -50,10 +55,27 @@ class OSSClientManager {
   public async uploadFile(fileName: string, file: File) {
     try {
       const client = await this.getClient()
-      const result = await client.put(fileName, file, { headers })
+      // const result = await client.put(fileName, file, { headers })
+      const result = await client.multipartUpload(fileName, file, {
+        progress,
+        headers,
+      })
+      // const head = await client.head(fileName)
       console.log('上传成功:', result)
+      // console.log(head)
     } catch (error) {
       console.error('上传失败:', error)
+      throw error
+    }
+  }
+
+  public async abortUpload(fileName: string, uploadId: string) {
+    try {
+      const client = await this.getClient()
+      // const result = await client.put(fileName, file, { headers })
+      // await client.abortMultipartUpload(fileName, uploadId)
+      await client.cancel()
+    } catch (error) {
       throw error
     }
   }
@@ -64,6 +86,15 @@ class OSSClientManager {
     // console.log(response)
     return response.data.data
   }
+}
+
+const progress = (p, cpt) => {
+  // Object的上传进度。
+  console.log(p)
+  uploadPercentage.value = parseFloat((p * 100).toFixed(2))
+  abortCheckpoint = cpt
+  // 分片上传的断点信息。
+  // console.log(_checkpoint)
 }
 
 // 自定义请求头
@@ -80,10 +111,8 @@ const headers = {
   'x-oss-forbid-overwrite': 'true',
 }
 
-async function put(options: JSON) {
+async function upload(options: JSON) {
   try {
-    // 填写OSS文件完整路径和本地文件的完整路径。OSS文件完整路径中不能包含Bucket名称。
-    // 如果本地文件的完整路径中未指定本地路径，则默认从示例程序所属项目对应本地路径中上传文件。
     // @ts-expect-error it dose
     const file = options.file
     // console.log(file)
@@ -91,16 +120,52 @@ async function put(options: JSON) {
     // console.log(fileName)
     await OSSClientManager.getInstance().uploadFile(fileName, file)
     // console.log(result)
+    console.log('上传完毕')
   } catch (e) {
     console.log(e)
   }
 }
+
+async function abort() {
+  if (abortCheckpoint != null) {
+    await OSSClientManager.getInstance().abortUpload(abortCheckpoint.name, abortCheckpoint.uploadId)
+  }
+}
+
+function beforeUpload() {
+  uploadPercentage.value = 0.0
+  showProgress.value = true
+}
+
+function exceed() {
+  console.log('exceed')
+}
 </script>
 
 <template>
-  <el-upload class="upload" drag action="#" :http-request="put" auto-upload>
+  <el-upload
+    class="upload"
+    drag
+    action="#"
+    :http-request="upload"
+    :before-upload="beforeUpload"
+    :on-remove="abort"
+    :limit="1"
+    :on-exceed="exceed"
+    auto-upload
+  >
     <el-icon class="el-icon--upload"><upload-filled /></el-icon>
     <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
     <div class="el-upload__text">最大文件大小2GB</div>
   </el-upload>
+
+  <div class="progress" v-show="showProgress">
+    <el-progress :text-inside="true" :stroke-width="26" :percentage="uploadPercentage" />
+  </div>
 </template>
+
+<!-- <style scoped>
+.uplpad {
+  max-width: 1280px;
+}
+</style> -->
