@@ -57,6 +57,8 @@ class OSSClientManager {
       const client = await this.getClient()
       // const result = await client.put(fileName, file, { headers })
       const result = await client.multipartUpload(fileName, file, {
+        parallel: 4,
+        partSize: 5 * 1024 * 1024,
         progress,
         headers,
       })
@@ -69,7 +71,7 @@ class OSSClientManager {
     }
   }
 
-  public async abortUpload(fileName: string, uploadId: string) {
+  public async abortUpload() {
     try {
       const client = await this.getClient()
       // const result = await client.put(fileName, file, { headers })
@@ -129,6 +131,8 @@ async function upload(options: JSON) {
 async function abort() {
   if (abortCheckpoint != null) {
     await OSSClientManager.getInstance().abortUpload(abortCheckpoint.name, abortCheckpoint.uploadId)
+    uploadPercentage.value = 0.0
+    showProgress.value = false
   }
 }
 
