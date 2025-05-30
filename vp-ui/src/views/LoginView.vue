@@ -1,10 +1,73 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const loginInfo = reactive({
   username: '',
   password: '',
 })
+
+const errorMsg = ref('')
+const isFormValid = ref(false)
+
+
+// 输入验证
+const validateInput = () => {
+  console.log(123)
+  // 基本验证
+  if (loginInfo.username && loginInfo.password) {
+    isFormValid.value = true
+    errorMsg.value = ''
+  } else {
+    isFormValid.value = false
+  }
+}
+
+const onSubmit = () => {
+  handleLogin()
+}
+
+// 登录处理
+const handleLogin = async () => {
+  // 防止XSS攻击
+  const xssPattern = /(~|{|}"|'|<|>|\?)/g;
+  if (xssPattern.test(loginInfo.username) || xssPattern.test(loginInfo.password)) {
+    errorMessage('输入内容包含非法字符');
+    return
+  }
+  try {
+    // 对输入进行转义处理
+    const safeUsername = encodeURIComponent(loginInfo.username)
+    const safePassword = encodeURIComponent(loginInfo.password)
+
+    // 实际的登录API调用
+    console.log('登录请求:', { username: safeUsername, password: safePassword })
+
+    // 模拟登录成功并设置cookie，设置过期时间为1小时
+    const expires = new Date(Date.now() + 3600 * 1000).toUTCString()
+    document.cookie = `authToken=yourAuthToken; path=/; expires=${expires}`
+
+    // 跳转到主页
+    router.push('/')
+  } catch (e) {
+    console.log(e)
+    errorMessage('登录失败:');
+  }
+}
+
+// 错误提示
+const errorMessage = (text: string) => {
+  errorMsg.value = text
+  setTimeout(() => {
+    errorMsg.value = ''
+  }, 3000)
+}
+
+onMounted(() => {
+  validateInput()
+})
+
 </script>
 
 <template>
@@ -14,22 +77,117 @@ const loginInfo = reactive({
         <h2>用户登陆</h2>
       </div>
       <el-form
-        :label-position="right"
         label-width="auto"
         :model="loginInfo"
         style="max-width: 600px"
+        class="floating-form"
+        @submit.prevent="validateInput"
       >
-        <el-form-item label="Username" :label-position="right">
-          <el-input v-model="loginInfo.username" />
+        <el-form-item label="用户名">
+          <el-input v-model="loginInfo.username" type="text" @input="validateInput"/>
         </el-form-item>
-        <el-form-item label="Password" :label-position="right">
-          <el-input v-model="loginInfo.password" />
+        <el-form-item label="密码">
+          <el-input v-model="loginInfo.password" type="password" show-password @input="validateInput"/>
         </el-form-item>
+
+        <div class="error-message" v-if="errorMsg">{{ errorMsg }}</div>
+        <el-button type="primary" @click="onSubmit" round class="submit-btn" :disabled="!isFormValid">
+          <span>登录</span>
+          <i class="arrow-icon"></i>
+        </el-button>
+        <div class="form-footer">
+          <span>还没有账号？</span>
+          <a href="/register">立即注册</a>
+        </div>
       </el-form>
     </div>
   </div>
 </template>
 
 <style scoped>
+
+.login-wrapper {
+  min-height: 93.5vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 20px;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 480px;
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: var(--el-box-shadow);
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.form-header h2 {
+  color: #2c3e50;
+  font-size: 32px;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 7px;
+  background: linear-gradient(to right, #3498db, #2980b9);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--el-box-shadow-light);
+}
+
+.arrow-icon {
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 3px;
+  transform: rotate(-45deg);
+}
+
+.form-footer {
+  text-align: center;
+  margin-top: 20px;
+  color: #95a5a6;
+}
+
+.form-footer a {
+  color: #3498db;
+  text-decoration: none;
+  margin-left: 5px;
+  font-weight: 600;
+}
+
+.form-footer a:hover {
+  text-decoration: underline;
+}
+
+.error-message {
+  color: #f56c6c;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 20px;
+}
 
 </style>
