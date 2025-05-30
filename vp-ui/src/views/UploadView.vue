@@ -4,6 +4,7 @@ import OSS from 'ali-oss'
 import axios from 'axios'
 import { reactive, ref } from 'vue'
 import { v4 as uuidv4 } from 'uuid';
+import PageHeader from '@/components/PageHeader.vue'
 
 interface UploadFile {
   fileUuid: string;     // 唯一标识
@@ -130,31 +131,34 @@ async function abortOrRemove(file: UploadFile) {
 </script>
 
 <template>
-  <el-upload
-    class="upload"
-    ref="uploadRef"
-    drag
-    multiple
-    action="#"
-    :http-request="upload"
-    :show-file-list="false"
-    auto-upload
-    v-show="true"
-  >
-    <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-    <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
-    <div class="el-upload__text">最大文件大小2GB</div>
-  </el-upload>
+  <PageHeader />
+  <el-main class="main">
+    <el-upload
+      class="upload"
+      ref="uploadRef"
+      drag
+      multiple
+      action="#"
+      :http-request="upload"
+      :show-file-list="false"
+      auto-upload
+      v-show="true"
+    >
+      <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+      <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+      <div class="el-upload__text">最大文件大小2GB</div>
+    </el-upload>
 
-  <div class="progress" v-for="file in uploadFiles" :key="file.fileUuid">
-    <div  v-if="!file.canceled">
-      <div class="name">
-        <span style="font-size: 1.8em;">{{ file.fileName }}</span>
-        <el-button type="danger" :icon="Delete" circle @click="abortOrRemove(file)" />
+    <div class="progress" v-for="file in uploadFiles" :key="file.fileUuid">
+      <div  v-if="!file.canceled">
+        <div class="name">
+          <span style="font-size: 1.8em;">{{ file.fileName }}</span>
+          <el-button type="danger" :icon="Delete" circle @click="abortOrRemove(file)" />
+        </div>
+        <el-progress :text-inside="true" :stroke-width="26" :percentage="file.percentage" :status="file.percentage == 100 ? 'success' : ''" />
       </div>
-      <el-progress :text-inside="true" :stroke-width="26" :percentage="file.percentage" :status="file.percentage == 100 ? 'success' : ''" />
     </div>
-  </div>
+  </el-main>
 </template>
 
 <style scoped>
@@ -163,5 +167,11 @@ async function abortOrRemove(file: UploadFile) {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 8px;
+}
+
+.main {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
 }
 </style>
