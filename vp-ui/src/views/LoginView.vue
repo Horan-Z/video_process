@@ -2,6 +2,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import { ElNotification } from 'element-plus'
 
 const router = useRouter()
 const loginInfo = reactive({
@@ -9,7 +10,6 @@ const loginInfo = reactive({
   password: '',
 })
 
-const errorMsg = ref('')
 const isFormValid = ref(false)
 
 interface res {
@@ -24,12 +24,7 @@ interface res {
 const validateInput = () => {
   console.log(123)
   // 基本验证
-  if (loginInfo.username && loginInfo.password) {
-    isFormValid.value = true
-    errorMsg.value = ''
-  } else {
-    isFormValid.value = false
-  }
+  isFormValid.value = !!(loginInfo.username && loginInfo.password);
 }
 
 const onSubmit = () => {
@@ -54,6 +49,7 @@ const handleLogin = async () => {
       errorMessage(response.data.msg)
     } else if (response.data.code == 200) {
       console.log('登录成功')
+      loginSuccess(loginInfo.username)
       // 跳转到主页
       router.push('/')
     } else {
@@ -65,12 +61,21 @@ const handleLogin = async () => {
   }
 }
 
+const loginSuccess = (name: string) => {
+  ElNotification({
+    title: '登录成功',
+    message: `用户${name}已登录`,
+    type: 'success',
+  })
+}
+
 // 错误提示
 const errorMessage = (text: string) => {
-  errorMsg.value = text
-  setTimeout(() => {
-    errorMsg.value = ''
-  }, 3000)
+  ElNotification({
+    title: 'Error',
+    message: text,
+    type: 'error',
+  })
 }
 
 onMounted(() => {
@@ -98,8 +103,6 @@ onMounted(() => {
         <el-form-item label="密码">
           <el-input v-model="loginInfo.password" type="password" show-password @input="validateInput"/>
         </el-form-item>
-
-        <div class="error-message" v-if="errorMsg">{{ errorMsg }}</div>
         <el-button type="primary" @click="onSubmit" round class="submit-btn" :disabled="!isFormValid">
           <span>登录</span>
           <i class="arrow-icon"></i>
@@ -190,13 +193,6 @@ onMounted(() => {
 
 .form-footer a:hover {
   text-decoration: underline;
-}
-
-.error-message {
-  color: #f56c6c;
-  font-size: 14px;
-  text-align: center;
-  margin-bottom: 20px;
 }
 
 </style>

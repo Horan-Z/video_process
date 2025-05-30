@@ -2,6 +2,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import { ElNotification } from 'element-plus'
 
 const router = useRouter()
 const registerInfo = reactive({
@@ -9,7 +10,6 @@ const registerInfo = reactive({
   password: '',
 })
 
-const errorMsg = ref('')
 const isFormValid = ref(false)
 
 interface res {
@@ -24,12 +24,7 @@ interface res {
 const validateInput = () => {
   console.log(123)
   // 基本验证
-  if (registerInfo.username && registerInfo.password) {
-    isFormValid.value = true
-    errorMsg.value = ''
-  } else {
-    isFormValid.value = false
-  }
+  isFormValid.value = !!(registerInfo.username && registerInfo.password);
 }
 
 const onSubmit = () => {
@@ -54,6 +49,7 @@ const handleRegister = async () => {
       errorMessage(response.data.msg)
     } else if (response.data.code == 200) {
       console.log('注册成功')
+      registerSuccess(registerInfo.username)
       // 跳转到登录页
       router.push('/login')
     } else {
@@ -61,16 +57,25 @@ const handleRegister = async () => {
     }
   } catch (e) {
     console.log(e)
-    errorMessage('注册失败:')
+    errorMessage('注册失败')
   }
+}
+
+const registerSuccess = (name: string) => {
+  ElNotification({
+    title: '注册成功',
+    message: `用户${name}已注册成功`,
+    type: 'error',
+  })
 }
 
 // 错误提示
 const errorMessage = (text: string) => {
-  errorMsg.value = text
-  setTimeout(() => {
-    errorMsg.value = ''
-  }, 3000)
+  ElNotification({
+    title: 'Error',
+    message: text,
+    type: 'error',
+  })
 }
 
 onMounted(() => {
@@ -102,8 +107,6 @@ onMounted(() => {
             @input="validateInput"
           />
         </el-form-item>
-
-        <div class="error-message" v-if="errorMsg">{{ errorMsg }}</div>
         <el-button
           type="primary"
           @click="onSubmit"
@@ -199,12 +202,5 @@ onMounted(() => {
 
 .form-footer a:hover {
   text-decoration: underline;
-}
-
-.error-message {
-  color: #f56c6c;
-  font-size: 14px;
-  text-align: center;
-  margin-bottom: 20px;
 }
 </style>
