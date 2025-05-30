@@ -58,7 +58,7 @@ async function createClient() {
 
 // 获取STS令牌
 async function fetchSTSToken() {
-  const response = await axios.get('http://localhost:8080/api/sts')
+  const response = await axios.get('http://localhost:8080/api/oss/sts')
   return response.data.data
 }
 

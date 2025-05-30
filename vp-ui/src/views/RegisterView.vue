@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import axios from 'axios'
 
 const router = useRouter()
-const loginInfo = reactive({
+const registerInfo = reactive({
   username: '',
   password: '',
 })
@@ -24,7 +24,7 @@ interface res {
 const validateInput = () => {
   console.log(123)
   // 基本验证
-  if (loginInfo.username && loginInfo.password) {
+  if (registerInfo.username && registerInfo.password) {
     isFormValid.value = true
     errorMsg.value = ''
   } else {
@@ -33,35 +33,35 @@ const validateInput = () => {
 }
 
 const onSubmit = () => {
-  handleLogin()
+  handleRegister()
 }
 
-// 登录处理
-const handleLogin = async () => {
+// 注册处理
+const handleRegister = async () => {
   // 防止XSS攻击
   const xssPattern = /(~|{|}"|'|<|>|\?)/g
-  if (xssPattern.test(loginInfo.username) || xssPattern.test(loginInfo.password)) {
+  if (xssPattern.test(registerInfo.username) || xssPattern.test(registerInfo.password)) {
     errorMessage('输入内容包含非法字符')
     return
   }
   try {
-    const response: res = await axios.post('http://localhost:8080/api/auth/login', {
-      username: loginInfo.username,
-      password: loginInfo.password,
+    const response: res = await axios.post('http://localhost:8080/api/auth/register', {
+      username: registerInfo.username,
+      password: registerInfo.password,
     })
 
     if (response.data.code == 401) {
       errorMessage(response.data.msg)
     } else if (response.data.code == 200) {
-      console.log('登录成功')
-      // 跳转到主页
-      router.push('/')
+      console.log('注册成功')
+      // 跳转到登录页
+      router.push('/login')
     } else {
       errorMessage(response.data.code.toString())
     }
   } catch (e) {
     console.log(e)
-    errorMessage('登录失败:')
+    errorMessage('注册失败:')
   }
 }
 
@@ -76,37 +76,47 @@ const errorMessage = (text: string) => {
 onMounted(() => {
   validateInput()
 })
-
 </script>
 
 <template>
-  <div class="login-wrapper">
-    <div class="login-container">
+  <div class="register-wrapper">
+    <div class="register-container">
       <div class="form-header">
-        <h2>用户登录</h2>
+        <h2>用户注册</h2>
       </div>
       <el-form
         label-width="auto"
-        :model="loginInfo"
+        :model="registerInfo"
         style="max-width: 600px"
         class="floating-form"
         @submit.prevent="validateInput"
       >
         <el-form-item label="用户名">
-          <el-input v-model="loginInfo.username" type="text" @input="validateInput"/>
+          <el-input v-model="registerInfo.username" type="text" @input="validateInput" />
         </el-form-item>
         <el-form-item label="密码">
-          <el-input v-model="loginInfo.password" type="password" show-password @input="validateInput"/>
+          <el-input
+            v-model="registerInfo.password"
+            type="password"
+            show-password
+            @input="validateInput"
+          />
         </el-form-item>
 
         <div class="error-message" v-if="errorMsg">{{ errorMsg }}</div>
-        <el-button type="primary" @click="onSubmit" round class="submit-btn" :disabled="!isFormValid">
-          <span>登录</span>
+        <el-button
+          type="primary"
+          @click="onSubmit"
+          round
+          class="submit-btn"
+          :disabled="!isFormValid"
+        >
+          <span>注册</span>
           <i class="arrow-icon"></i>
         </el-button>
         <div class="form-footer">
-          <span>还没有账号？</span>
-          <a href="/register">立即注册</a>
+          <span>已有账号？</span>
+          <a href="/login">立即登录</a>
         </div>
       </el-form>
     </div>
@@ -114,8 +124,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-
-.login-wrapper {
+.register-wrapper {
   min-height: 93.5vh;
   display: flex;
   align-items: center;
@@ -124,7 +133,7 @@ onMounted(() => {
   padding: 20px;
 }
 
-.login-container {
+.register-container {
   width: 100%;
   max-width: 480px;
   background: white;
@@ -198,5 +207,4 @@ onMounted(() => {
   text-align: center;
   margin-bottom: 20px;
 }
-
 </style>
