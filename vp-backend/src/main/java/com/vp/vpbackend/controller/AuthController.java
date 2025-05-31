@@ -1,5 +1,6 @@
 package com.vp.vpbackend.controller;
 
+import com.vp.vpbackend.POJO.DTO.TokenDTO;
 import com.vp.vpbackend.POJO.Result;
 import com.vp.vpbackend.POJO.DTO.AuthDTO;
 import com.vp.vpbackend.service.AuthService;
@@ -21,5 +22,10 @@ public class AuthController {
     @PostMapping("/register")
     public Result register(@RequestBody AuthDTO authDTO) {
         return authService.register(authDTO);
+    }
+
+    @PostMapping("/logout")
+    public Result logout(@RequestBody TokenDTO tokenDTO) {
+        return authService.logout(tokenDTO);
     }
 }

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import apiClient from '@/api/httpClient.ts'
+import type { HttpResponse } from '@/types/response'
 import { ElNotification } from 'element-plus'
 
 const router = useRouter()
@@ -11,14 +12,6 @@ const registerInfo = reactive({
 })
 
 const isFormValid = ref(false)
-
-interface res {
-  data: {
-    code: number
-    msg: string
-    data: object
-  }
-}
 
 // 输入验证
 const validateInput = () => {
@@ -40,20 +33,19 @@ const handleRegister = async () => {
     return
   }
   try {
-    const response: res = await axios.post('http://localhost:8080/api/auth/register', {
+    const response: HttpResponse<object> = await apiClient.post<HttpResponse<object>>('/api/auth/register', {
       username: registerInfo.username,
       password: registerInfo.password,
     })
-
-    if (response.data.code == 401) {
-      errorMessage(response.data.msg)
-    } else if (response.data.code == 200) {
+    if (response.code == 401) {
+      errorMessage(response.msg)
+    } else if (response.code == 200) {
       console.log('注册成功')
       registerSuccess(registerInfo.username)
       // 跳转到登录页
       router.push('/login')
     } else {
-      errorMessage(response.data.code.toString())
+      errorMessage(response.code.toString())
     }
   } catch (e) {
     console.log(e)

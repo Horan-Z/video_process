@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import apiClient from '@/api/httpClient.ts'
+import type { HttpResponse } from '@/types/response'
 import { ElNotification } from 'element-plus'
 
 const router = useRouter()
@@ -12,17 +13,8 @@ const loginInfo = reactive({
 
 const isFormValid = ref(false)
 
-interface res {
-  data: {
-    code: number
-    msg: string
-    data: object
-  }
-}
-
 // 输入验证
 const validateInput = () => {
-  console.log(123)
   // 基本验证
   isFormValid.value = !!(loginInfo.username && loginInfo.password);
 }
@@ -40,20 +32,21 @@ const handleLogin = async () => {
     return
   }
   try {
-    const response: res = await axios.post('http://localhost:8080/api/auth/login', {
+    // 使用示例
+    const response: HttpResponse<object> = await apiClient.post<HttpResponse<object>>('/api/auth/login', {
       username: loginInfo.username,
-      password: loginInfo.password,
+      password: loginInfo.password
     })
-
-    if (response.data.code == 401) {
-      errorMessage(response.data.msg)
-    } else if (response.data.code == 200) {
+    if (response.code == 401) {
+      errorMessage(response.msg)
+    } else if (response.code == 200) {
       console.log('登录成功')
-      loginSuccess(loginInfo.username)
+      loginSuccess(response)
       // 跳转到主页
       router.push('/')
     } else {
-      errorMessage(response.data.code.toString())
+      console.log(response)
+      errorMessage(response.code.toString())
     }
   } catch (e) {
     console.log(e)
@@ -61,10 +54,13 @@ const handleLogin = async () => {
   }
 }
 
-const loginSuccess = (name: string) => {
+const loginSuccess = (response: HttpResponse<object>) => {
+  console.log(response)
+  localStorage.setItem('tokenName', response.data.tokenInfo.tokenName)
+  localStorage.setItem('tokenValue', response.data.tokenInfo.tokenValue)
   ElNotification({
     title: '登录成功',
-    message: `用户${name}已登录`,
+    message: `用户${response.data.username}已登录`,
     type: 'success',
   })
 }

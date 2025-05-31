@@ -3,6 +3,7 @@ package com.vp.vpbackend.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.vp.vpbackend.POJO.DO.UserDO;
 import com.vp.vpbackend.POJO.DTO.AuthDTO;
+import com.vp.vpbackend.POJO.DTO.TokenDTO;
 import com.vp.vpbackend.POJO.Result;
 import com.vp.vpbackend.POJO.VO.AuthVO;
 import com.vp.vpbackend.mapper.UserMapper;
@@ -46,6 +47,11 @@ public class AuthService {
         user.setUpdateTime(LocalDateTime.now());
         user.setUuid(UUID.randomUUID().toString());
         userMapper.insert(user);
+        return new Result(200, "Success", null);
+    }
+
+    public Result logout(TokenDTO tokenDTO) {
+        StpUtil.logoutByTokenValue(tokenDTO.getTokenValue());
         return new Result(200, "Success", null);
     }
 }

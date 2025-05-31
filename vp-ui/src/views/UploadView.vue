@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { UploadFilled, Delete } from '@element-plus/icons-vue'
+import { UploadFilled, Delete, Check } from '@element-plus/icons-vue'
 import OSS from 'ali-oss'
-import axios from 'axios'
+import apiClient from '@/api/httpClient.ts'
+import type { HttpResponse } from '@/types/response'
 import { reactive, ref } from 'vue'
 import { v4 as uuidv4 } from 'uuid';
 import PageHeader from '@/components/PageHeader.vue'
@@ -12,7 +13,6 @@ interface UploadFile {
   percentage: number;   // 上传进度
   checkpoint: object | null;   // 分片上传checkpoint
   inProgress: boolean;  // 是否上传中
-  uploadFinish: boolean;// 是否上传完成
   file: File;           // 文件对象
   ossObject: string;
   canceled: boolean;
@@ -58,8 +58,9 @@ async function createClient() {
 
 // 获取STS令牌
 async function fetchSTSToken() {
-  const response = await axios.get('http://localhost:8080/api/oss/sts')
-  return response.data.data
+  const response: HttpResponse<object> = await apiClient.get<HttpResponse<object>>('/api/oss/sts')
+  // const response = await axios.get('http://localhost:8080/api/oss/sts')
+  return response.data
 }
 
 function getFileExtension(filename: string) {
@@ -76,7 +77,6 @@ async function upload(options: object) {
       percentage: 0,
       checkpoint: null,
       inProgress: true,
-      uploadFinish: false,
       // @ts-expect-error it does exist
       file: options.file,
       ossObject: '',
@@ -101,31 +101,31 @@ async function upload(options: object) {
   }
 }
 
-function uploadSuccess(newFile: UploadFile) {
-  newFile.inProgress = false
-  newFile.uploadFinish = true
-  newFile.percentage = 100.00
+function uploadSuccess(file: UploadFile) {
+  file.inProgress = false
+  file.percentage = 100.00
+  setTimeout(() => {
+    removeFromList(file)
+  }, 5000);
 }
 
 async function abortOrRemove(file: UploadFile) {
   try{
     file.canceled = true
     if(file.inProgress) {
-      // // @ts-expect-error it does exist
-      // await file.client.abortMultipartUpload(file.checkpoint.name, file.checkpoint.uploadId)
-      // @ts-expect-error it does exist
       await file.client.cancel()
-    } else if(file.uploadFinish) {
-      console.log('remove')
-      // TODO remove logic
     }
-    // 从列表中移除文件
-    const index = uploadFiles.value.findIndex(f => f.fileUuid === file.fileUuid);
-    if (index !== -1) {
-      uploadFiles.value.splice(index, 1);
-    }
+    removeFromList(file)
   } catch(e) {
     console.log(e)
+  }
+}
+
+function removeFromList(file: UploadFile) {
+  // 从列表中移除文件
+  const index = uploadFiles.value.findIndex(f => f.fileUuid === file.fileUuid);
+  if (index !== -1) {
+    uploadFiles.value.splice(index, 1);
   }
 }
 </script>
@@ -153,7 +153,8 @@ async function abortOrRemove(file: UploadFile) {
       <div  v-if="!file.canceled">
         <div class="name">
           <span style="font-size: 1.8em;">{{ file.fileName }}</span>
-          <el-button type="danger" :icon="Delete" circle @click="abortOrRemove(file)" />
+          <el-button v-show="file.inProgress" type="danger" :icon="Delete" circle @click="abortOrRemove(file)" />
+          <el-button v-show="file.percentage == 100" type="success" :icon="Check" circle style="pointer-events: none"/>
         </div>
         <el-progress :text-inside="true" :stroke-width="26" :percentage="file.percentage" :status="file.percentage == 100 ? 'success' : ''" />
       </div>
