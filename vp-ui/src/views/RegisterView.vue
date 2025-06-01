@@ -48,7 +48,7 @@ const handleRegister = async () => {
       console.log('注册成功')
       registerSuccess(registerInfo.username)
       // 跳转到登录页
-      router.push('/login')
+      await router.push('/login')
     } else {
       errorMessage(response.code.toString())
     }
@@ -62,7 +62,7 @@ const registerSuccess = (name: string) => {
   ElNotification({
     title: '注册成功',
     message: `用户${name}已注册成功`,
-    type: 'error',
+    type: 'success',
   })
 }
 

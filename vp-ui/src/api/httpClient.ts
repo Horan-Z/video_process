@@ -1,7 +1,5 @@
 import axios, { type InternalAxiosRequestConfig, type AxiosResponse } from 'axios';
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
+import router from '@/router'
 
 class HttpClient {
   private instance;
