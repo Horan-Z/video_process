@@ -2,7 +2,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import apiClient from '@/api/httpClient.ts'
-import type { HttpResponse } from '@/types/response'
+import type { HttpResponse } from '@/types/Response'
 import { ElNotification } from 'element-plus'
 
 const router = useRouter()
@@ -10,6 +10,11 @@ const loginInfo = reactive({
   username: '',
   password: '',
 })
+
+interface LoginRequest {
+  username: string;
+  password: string;
+}
 
 const isFormValid = ref(false)
 
@@ -33,7 +38,7 @@ const handleLogin = async () => {
   }
   try {
     // 使用示例
-    const response: HttpResponse<object> = await apiClient.post<HttpResponse<object>>('/api/auth/login', {
+    const response = await apiClient.post<HttpResponse<object>, LoginRequest>('/api/auth/login', {
       username: loginInfo.username,
       password: loginInfo.password
     })
@@ -43,7 +48,7 @@ const handleLogin = async () => {
       console.log('登录成功')
       loginSuccess(response)
       // 跳转到主页
-      router.push('/')
+      await router.push('/')
     } else {
       console.log(response)
       errorMessage(response.code.toString())

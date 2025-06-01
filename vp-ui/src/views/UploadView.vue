@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { UploadFilled, Delete, Check } from '@element-plus/icons-vue'
 import apiClient from '@/api/httpClient.ts'
-import type { HttpResponse } from '@/types/response'
+import type { HttpResponse } from '@/types/Response'
 import { reactive, ref } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
 import PageHeader from '@/components/PageHeader.vue'

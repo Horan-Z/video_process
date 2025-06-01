@@ -54,4 +54,12 @@ public class AuthService {
         StpUtil.logoutByTokenValue(tokenDTO.getTokenValue());
         return new Result(200, "Success", null);
     }
+
+    public Result checkLogin() {
+        if(StpUtil.isLogin()) {
+            return new Result(200, "Yes", null);
+        } else {
+            return new Result(401, "No", null);
+        }
+    }
 }

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import apiClient from '@/api/httpClient.ts'
 import { Delete } from '@element-plus/icons-vue'
-import router from '@/router'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 function logout() {
   const tokenName = localStorage.getItem('tokenName')

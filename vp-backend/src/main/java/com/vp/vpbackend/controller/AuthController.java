@@ -28,4 +28,9 @@ public class AuthController {
     public Result logout(@RequestBody TokenDTO tokenDTO) {
         return authService.logout(tokenDTO);
     }
+
+    @PostMapping("check-login")
+    public Result checkLogin() {
+        return authService.checkLogin();
+    }
 }

@@ -2,19 +2,19 @@
 import { reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import apiClient from '@/api/httpClient.ts'
-import type { HttpResponse } from '@/types/response'
+import type { HttpResponse } from '@/types/Response'
 import { ElNotification } from 'element-plus'
+
+interface RegisterRequest {
+  username: string;
+  password: string;
+}
 
 const router = useRouter()
 const registerInfo = reactive({
   username: '',
   password: '',
 })
-
-interface registerRequest {
-  username: string;
-  password: string;
-}
 
 const isFormValid = ref(false)
 
@@ -37,7 +37,7 @@ const handleRegister = async () => {
     return
   }
   try {
-    const response: HttpResponse<object> = await apiClient.post<HttpResponse<object>, registerRequest>('/api/auth/register', {
+    const response: HttpResponse<object> = await apiClient.post<HttpResponse<object>, RegisterRequest>('/api/auth/register', {
       username: registerInfo.username,
       password: registerInfo.password,
     })
