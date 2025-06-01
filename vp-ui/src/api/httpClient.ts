@@ -1,4 +1,5 @@
 import axios, { type InternalAxiosRequestConfig, type AxiosResponse } from 'axios';
+import router from '@/router'
 
 class HttpClient {
   private instance;
@@ -42,6 +43,8 @@ class HttpClient {
         switch (status) {
           case 401:
             console.log('未授权，跳转到登录页');
+            localStorage.clear()
+            router.push('/login')
             break;
           case 403:
             console.log('禁止访问');
