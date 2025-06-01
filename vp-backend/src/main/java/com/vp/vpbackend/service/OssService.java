@@ -38,6 +38,7 @@ public class OssService {
         fileDo.setBelongTo(StpUtil.getLoginIdAsString());
         fileDo.setCreateTime(LocalDateTime.now());
         fileDo.setLastUsedTime(LocalDateTime.now());
+        fileDo.setFileType((short) 0);
 
         fileDo.setVideoFormat("null");
         fileDo.setVideoCodec("null");

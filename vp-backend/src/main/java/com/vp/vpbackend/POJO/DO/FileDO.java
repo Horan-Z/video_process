@@ -14,6 +14,8 @@ public class FileDO {
 
     private String belongTo;
 
+    private Short fileType;
+
     private String fileName;
 
     private String fileUuid;
