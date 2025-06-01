@@ -4,22 +4,37 @@ import OSS from 'ali-oss'
 import apiClient from '@/api/httpClient.ts'
 import type { HttpResponse } from '@/types/response'
 import { reactive, ref } from 'vue'
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid'
 import PageHeader from '@/components/PageHeader.vue'
 
 interface UploadFile {
-  fileUuid: string;     // 唯一标识
-  fileName: string;     // 文件名
-  percentage: number;   // 上传进度
-  checkpoint: object | null;   // 分片上传checkpoint
-  inProgress: boolean;  // 是否上传中
-  file: File;           // 文件对象
-  ossObject: string;
-  canceled: boolean;
-  client: OSS;
+  fileUuid: string // 唯一标识
+  fileName: string // 文件名
+  percentage: number // 上传进度
+  checkpoint: object | null // 分片上传checkpoint
+  inProgress: boolean // 是否上传中
+  file: File // 文件对象
+  ossObject: string
+  canceled: boolean
+  client: OSS
 }
 
-const uploadFiles = ref<UploadFile[]>([]);
+interface UploadRequest {
+  fileName: string;
+  fileUuid: string;
+  fileExtension: string | undefined;
+  filePath: string;
+}
+
+interface Token {
+  credentials: {
+    accessKeyId: string;
+    accessKeySecret: string;
+    securityToken: string
+  }
+}
+
+const uploadFiles = ref<UploadFile[]>([])
 
 // 自定义请求头
 const headers = {
@@ -36,7 +51,7 @@ const headers = {
 }
 
 async function createClient() {
-  const token = await fetchSTSToken()
+  const token: Token = await fetchSTSToken()
   return new OSS({
     region: 'oss-cn-beijing',
     accessKeyId: token.credentials.accessKeyId,
@@ -46,7 +61,7 @@ async function createClient() {
     authorizationV4: true,
     bucket: 'xiaoming10086',
     refreshSTSToken: async () => {
-      const token = await fetchSTSToken()
+      const token: Token = await fetchSTSToken()
       return {
         accessKeyId: token.credentials.accessKeyId,
         accessKeySecret: token.credentials.accessKeySecret,
@@ -57,15 +72,14 @@ async function createClient() {
 }
 
 // 获取STS令牌
-async function fetchSTSToken() {
-  const response: HttpResponse<object> = await apiClient.get<HttpResponse<object>>('/api/oss/sts')
-  // const response = await axios.get('http://localhost:8080/api/oss/sts')
+async function fetchSTSToken(): Promise<Token> {
+  const response: HttpResponse<Token> = await apiClient.get<HttpResponse<Token>>('/api/oss/sts')
   return response.data
 }
 
 function getFileExtension(filename: string) {
-  const parts = filename.split('.');
-  return parts.length > 1 ? parts.pop() : '';
+  const parts = filename.split('.')
+  return parts.length > 1 ? parts.pop() : ''
 }
 
 async function upload(options: object) {
@@ -81,7 +95,7 @@ async function upload(options: object) {
       file: options.file,
       ossObject: '',
       canceled: false,
-      client: await createClient()
+      client: await createClient(),
     })
     uploadFiles.value.push(newFile)
     newFile.ossObject = `/vp/source/${newFile.fileUuid}.${getFileExtension(newFile.fileName)}`
@@ -103,29 +117,36 @@ async function upload(options: object) {
 
 function uploadSuccess(file: UploadFile) {
   file.inProgress = false
-  file.percentage = 100.00
+  file.percentage = 100.0
+  apiClient.post<HttpResponse<object>, UploadRequest>('/api/oss/register-upload', {
+    fileName: file.fileName,
+    fileUuid: file.fileUuid,
+    fileExtension: getFileExtension(file.fileName),
+    filePath: '/vp/source/'
+  })
   setTimeout(() => {
     removeFromList(file)
-  }, 5000);
+  }, 5000)
 }
 
 async function abortOrRemove(file: UploadFile) {
-  try{
+  try {
     file.canceled = true
-    if(file.inProgress) {
+    if (file.inProgress) {
+      // @ts-expect-error it does exist
       await file.client.cancel()
     }
     removeFromList(file)
-  } catch(e) {
+  } catch (e) {
     console.log(e)
   }
 }
 
 function removeFromList(file: UploadFile) {
   // 从列表中移除文件
-  const index = uploadFiles.value.findIndex(f => f.fileUuid === file.fileUuid);
+  const index = uploadFiles.value.findIndex((f) => f.fileUuid === file.fileUuid)
   if (index !== -1) {
-    uploadFiles.value.splice(index, 1);
+    uploadFiles.value.splice(index, 1)
   }
 }
 </script>
@@ -150,13 +171,30 @@ function removeFromList(file: UploadFile) {
     </el-upload>
 
     <div class="progress" v-for="file in uploadFiles" :key="file.fileUuid">
-      <div  v-if="!file.canceled">
+      <div v-if="!file.canceled">
         <div class="name">
-          <span style="font-size: 1.8em;">{{ file.fileName }}</span>
-          <el-button v-show="file.inProgress" type="danger" :icon="Delete" circle @click="abortOrRemove(file)" />
-          <el-button v-show="file.percentage == 100" type="success" :icon="Check" circle style="pointer-events: none"/>
+          <span style="font-size: 1em">{{ file.fileName }}</span>
+          <el-button
+            v-show="file.inProgress"
+            type="danger"
+            :icon="Delete"
+            circle
+            @click="abortOrRemove(file)"
+          />
+          <el-button
+            v-show="file.percentage == 100"
+            type="success"
+            :icon="Check"
+            circle
+            style="pointer-events: none"
+          />
         </div>
-        <el-progress :text-inside="true" :stroke-width="26" :percentage="file.percentage" :status="file.percentage == 100 ? 'success' : ''" />
+        <el-progress
+          :text-inside="true"
+          :stroke-width="26"
+          :percentage="file.percentage"
+          :status="file.percentage == 100 ? 'success' : ''"
+        />
       </div>
     </div>
   </el-main>

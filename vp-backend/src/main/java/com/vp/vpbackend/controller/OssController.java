@@ -1,11 +1,10 @@
 package com.vp.vpbackend.controller;
 
+import com.vp.vpbackend.POJO.DTO.UploadDTO;
 import com.vp.vpbackend.POJO.Result;
 import com.vp.vpbackend.service.OssService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -17,5 +16,10 @@ public class OssController {
     @GetMapping("/sts")
     public Result getSts() {
         return ossService.getSts();
+    }
+
+    @PostMapping("/register-upload")
+    public Result registerUpload(@RequestBody UploadDTO uploadDTO) {
+        return ossService.registerUpload(uploadDTO);
     }
 }

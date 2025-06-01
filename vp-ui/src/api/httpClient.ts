@@ -1,4 +1,4 @@
-import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios';
+import axios, { type InternalAxiosRequestConfig, type AxiosResponse } from 'axios';
 
 class HttpClient {
   private instance;
@@ -18,7 +18,7 @@ class HttpClient {
   private setupInterceptors() {
     // 请求拦截器
     this.instance.interceptors.request.use(
-      (config: AxiosRequestConfig) => {
+      (config: InternalAxiosRequestConfig) => {
         const tokenName = localStorage.getItem('tokenName');
         const tokenValue = localStorage.getItem('tokenValue');
         if (tokenName && tokenValue) {
@@ -57,22 +57,22 @@ class HttpClient {
   }
 
   // GET 请求
-  public get<T = never>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  public get<T = never>(url: string, config?: InternalAxiosRequestConfig): Promise<T> {
     return this.instance.get(url, config);
   }
 
   // POST 请求
-  public post<T = never, D = never>(url: string, data?: D, config?: AxiosRequestConfig): Promise<T> {
+  public post<T = never, D = never>(url: string, data?: D, config?: InternalAxiosRequestConfig): Promise<T> {
     return this.instance.post(url, data, config);
   }
 
   // PUT 请求
-  public put<T = never, D = never>(url: string, data?: D, config?: AxiosRequestConfig): Promise<T> {
+  public put<T = never, D = never>(url: string, data?: D, config?: InternalAxiosRequestConfig): Promise<T> {
     return this.instance.put(url, data, config);
   }
 
   // DELETE 请求
-  public delete<T = never>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  public delete<T = never>(url: string, config?: InternalAxiosRequestConfig): Promise<T> {
     return this.instance.delete(url, config);
   }
 }

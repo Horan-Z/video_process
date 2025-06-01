@@ -1,26 +1,21 @@
 # 使用Alibaba Cloud Linux 3作为基础镜像
-FROM alibaba-cloud-linux-3-registry.cn-hangzhou.cr.aliyuncs.com/alinux3/alinux3:latest
+FROM ubuntu:22.04
 
 LABEL authors="xiaoming10086"
 
+ENV DEBIAN_FRONTEND=noninteractive
 ENV JAVA_VERSION=17 \
     JAVA_HOME=/usr/lib/jvm/bellsoft-java17-full-amd64 \
     PATH=$PATH:/usr/lib/jvm/bellsoft-java17-full-amd64/bin
 
-RUN yum makecache && \
-    yum update -y && \
-    yum install -y wget tar gzip && \
-    echo '[BELLSOFT]' > /etc/yum.repos.d/bellsoft.repo && \
-    echo 'name=BELLSOFT Repository' >> /etc/yum.repos.d/bellsoft.repo && \
-    echo 'baseurl=https://yum.bell-sw.com' >> /etc/yum.repos.d/bellsoft.repo && \
-    echo 'enabled=1' >> /etc/yum.repos.d/bellsoft.repo && \
-    echo 'gpgcheck=1' >> /etc/yum.repos.d/bellsoft.repo && \
-    echo 'gpgkey=https://download.bell-sw.com/pki/GPG-KEY-bellsoft' >> /etc/yum.repos.d/bellsoft.repo && \
-    echo 'priority=1' >> /etc/yum.repos.d/bellsoft.repo && \
-    yum install -y bellsoft-java17-runtime && \
-    yum install -y automake gcc-c++ git libcurl-devel libxml2-devel fuse-devel make openssl-devel && \
-    yum clean all && \
-    rm -rf /var/cache/yum && \
+RUN apt-get update -y && \
+    apt-get install -y wget gpg ffmpeg && \
+    mkdir -m 0755 -p /etc/apt/keyrings/ && \
+    wget -q -O - https://download.bell-sw.com/pki/GPG-KEY-bellsoft | gpg --dearmor | tee /etc/apt/keyrings/GPG-KEY-bellsoft.gpg > /dev/null && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/GPG-KEY-bellsoft.gpg] https://apt.bell-sw.com/ stable main" | tee /etc/apt/sources.list.d/bellsoft.list && \
+    apt-get update && \
+    apt-get install -y bellsoft-java17-runtime && \
+    apt-get install -y automake autotools-dev g++ git libcurl4-gnutls-dev libfuse-dev libssl-dev libxml2-dev make pkg-config && \
     git clone https://github.com/aliyun/ossfs.git && \
     cd ossfs && \
     ./autogen.sh && \
