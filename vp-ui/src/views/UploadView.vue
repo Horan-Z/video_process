@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { UploadFilled, Delete, Check } from '@element-plus/icons-vue'
-import OSS from 'ali-oss'
 import apiClient from '@/api/httpClient.ts'
 import type { HttpResponse } from '@/types/response'
 import { reactive, ref } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
 import PageHeader from '@/components/PageHeader.vue'
+import OSS from 'ali-oss'
 
 interface UploadFile {
   fileUuid: string // 唯一标识
@@ -19,7 +19,7 @@ interface UploadFile {
   client: OSS
 }
 
-interface UploadRequest {
+interface UploadCallback {
   fileName: string;
   fileUuid: string;
   fileExtension: string | undefined;
@@ -100,14 +100,36 @@ async function upload(options: object) {
     })
     uploadFiles.value.push(newFile)
     newFile.ossObject = `/vp/source/${newFile.fileUuid}.${getFileExtension(newFile.fileName)}`
+    // const tokenName = localStorage.getItem('tokenName');
+    // const tokenValue = localStorage.getItem('tokenValue');
+
     const result = await newFile.client.multipartUpload(newFile.ossObject, newFile.file, {
-      parallel: 4,
+      parallel: 1,
       partSize: 5 * 1024 * 1024, // 5MByte
       progress: (p: number, checkpoint: object) => {
         newFile.percentage = parseFloat((p * 100).toFixed(2))
         newFile.checkpoint = checkpoint
       },
       headers,
+      // callback: {
+      //   // 设置回调请求的服务器地址，例如http://oss-demo.aliyuncs.com:23450。
+      //   url: "http://101.201.106.204:8080/api/oss/upload-callback",
+      //   //（可选）设置回调请求消息头中Host的值，即您的服务器配置Host的值。
+      //   //host: 'yourCallbackHost',
+      //   // 设置发起回调时请求body的值。
+      //   body: "fileName=${x:fileName}&fileUuid=${x:fileUuid}&fileExtension=${x:fileExtension}&filePath=${x:filePath}",
+      //   // 设置发起回调请求的Content-Type。
+      //   contentType: "application/json",
+      //   customValue: {
+      //     fileName: newFile.fileName,
+      //     fileUuid: newFile.fileUuid,
+      //     fileExtension: getFileExtension(newFile.fileName),
+      //     filePath: '/vp/source/'
+      //   },
+      //   headers: {
+      //     [tokenName!]: tokenValue
+      //   }
+      // }
     })
     console.log('上传成功:', result)
     uploadSuccess(newFile)
@@ -119,7 +141,7 @@ async function upload(options: object) {
 function uploadSuccess(file: UploadFile) {
   file.inProgress = false
   file.percentage = 100.0
-  apiClient.post<HttpResponse<object>, UploadRequest>('/api/oss/register-upload', {
+  apiClient.post<HttpResponse<object>, UploadCallback>('/api/oss/upload-callback', {
     fileName: file.fileName,
     fileUuid: file.fileUuid,
     fileExtension: getFileExtension(file.fileName),

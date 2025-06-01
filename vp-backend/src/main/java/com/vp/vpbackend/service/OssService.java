@@ -5,7 +5,6 @@ import com.vp.vpbackend.POJO.DO.FileDO;
 import com.vp.vpbackend.POJO.DTO.UploadDTO;
 import com.vp.vpbackend.POJO.Result;
 import com.vp.vpbackend.common.AliyunSTS;
-import com.vp.vpbackend.mapper.FileMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,15 +14,10 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class OssService {
 
-    private final FileMapper fileMapper;
-
     private final MediaProcessingService mediaProcessingService;
 
     public Result getSts() {
-        if(StpUtil.isLogin()) {
-            return new Result(200, "OK", AliyunSTS.getStsCredentials());
-        }
-        return new Result(400, "Fail", null);
+        return new Result(200, "OK", AliyunSTS.getStsCredentials());
     }
 
     public Result registerUpload(UploadDTO uploadDTO) {
@@ -45,9 +39,6 @@ public class OssService {
         fileDo.setFileSizeBytes(0L);
         fileDo.setVideoDurationMillis(0L);
         fileDo.setVideoBitrate(0L);
-
-        // 先保存基本信息到数据库，此时 fileDo 会被回填 ID
-        fileMapper.insert(fileDo);
 
         // 异步处理媒体信息，传递 ID 而不是整个对象
         mediaProcessingService.processMedia(fileDo, uploadDTO);

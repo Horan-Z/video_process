@@ -61,7 +61,7 @@ public class MediaProcessingService {
             fileDo.setFileSizeBytes(result.getFormat().getSize());
 
             // 更新文件信息到数据库
-            fileMapper.updateById(fileDo);
+            fileMapper.insert(fileDo);
 
         } catch (Exception e) {
             // 处理异常，可以记录日志或进行其他操作

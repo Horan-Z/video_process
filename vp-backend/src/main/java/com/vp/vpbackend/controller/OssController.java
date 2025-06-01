@@ -18,8 +18,19 @@ public class OssController {
         return ossService.getSts();
     }
 
-    @PostMapping("/register-upload")
-    public Result registerUpload(@RequestBody UploadDTO uploadDTO) {
+//    @CrossOrigin(origins = "*")
+//    @PostMapping("/upload-callback")
+//    public Result uploadCallback(
+//            @RequestParam("fileName") String fileName,
+//            @RequestParam("fileUuid") String fileUuid,
+//            @RequestParam("fileExtension") String fileExtension,
+//            @RequestParam("filePath") String filePath
+//    ) {
+//        return ossService.registerUpload(new UploadDTO(fileName, fileUuid, fileExtension, filePath));
+//    }
+
+    @PostMapping("/upload-callback")
+    public Result uploadCallback(@RequestBody UploadDTO uploadDTO) {
         return ossService.registerUpload(uploadDTO);
     }
 }

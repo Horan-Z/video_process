@@ -5,7 +5,7 @@ spring:
     username: root
     password: root
 #    url: jdbc:mysql://221.236.27.82:53306/video_process
-    url: jdbc:mysql://172.17.0.3:3306/video_process
+    url: jdbc:mysql://db:3306/video_process
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 server:

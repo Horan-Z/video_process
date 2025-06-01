@@ -36,5 +36,4 @@ class VpBackendApplicationTests {
 		System.out.println("Format: " + result.getFormat().getSize());
 		System.out.println("Exact duration: " + durationMillis.get() + " milliseconds");
 	}
-
 }
