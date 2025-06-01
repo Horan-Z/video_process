@@ -74,6 +74,7 @@ async function createClient() {
 // 获取STS令牌
 async function fetchSTSToken(): Promise<Token> {
   const response: HttpResponse<Token> = await apiClient.get<HttpResponse<Token>>('/api/oss/sts')
+  console.log(response)
   return response.data
 }
 
@@ -100,7 +101,7 @@ async function upload(options: object) {
     uploadFiles.value.push(newFile)
     newFile.ossObject = `/vp/source/${newFile.fileUuid}.${getFileExtension(newFile.fileName)}`
     const result = await newFile.client.multipartUpload(newFile.ossObject, newFile.file, {
-      // parallel: 1,
+      parallel: 4,
       partSize: 5 * 1024 * 1024, // 5MByte
       progress: (p: number, checkpoint: object) => {
         newFile.percentage = parseFloat((p * 100).toFixed(2))

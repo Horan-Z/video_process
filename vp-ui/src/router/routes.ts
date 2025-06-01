@@ -10,7 +10,7 @@ const routes = [
   {
     path: '/upload',
     component: Upload,
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: true }
   },
   {
     path: '/register',

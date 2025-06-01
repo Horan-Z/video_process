@@ -11,11 +11,15 @@ const registerInfo = reactive({
   password: '',
 })
 
+interface registerRequest {
+  username: string;
+  password: string;
+}
+
 const isFormValid = ref(false)
 
 // 输入验证
 const validateInput = () => {
-  console.log(123)
   // 基本验证
   isFormValid.value = !!(registerInfo.username && registerInfo.password);
 }
@@ -33,10 +37,11 @@ const handleRegister = async () => {
     return
   }
   try {
-    const response: HttpResponse<object> = await apiClient.post<HttpResponse<object>>('/api/auth/register', {
+    const response: HttpResponse<object> = await apiClient.post<HttpResponse<object>, registerRequest>('/api/auth/register', {
       username: registerInfo.username,
       password: registerInfo.password,
     })
+    console.log(response.toString())
     if (response.code == 401) {
       errorMessage(response.msg)
     } else if (response.code == 200) {
