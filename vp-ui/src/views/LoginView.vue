@@ -63,8 +63,9 @@ const handleLogin = async () => {
     }
   } catch (e) {
     console.log(e)
-    errorMessage('登录失败:')
+    errorMessage('登录失败')
   }
+  loginInfo.password = ''
 }
 
 const loginSuccess = (response: HttpResponse<LoginResponseData>) => {
@@ -73,7 +74,7 @@ const loginSuccess = (response: HttpResponse<LoginResponseData>) => {
   localStorage.setItem('userUuid', response.data.uuid)
   ElNotification({
     title: '登录成功',
-    message: `用户${response.data.uuid}已登录`,
+    message: `用户${response.data.username}已登录`,
     type: 'success',
   })
 }

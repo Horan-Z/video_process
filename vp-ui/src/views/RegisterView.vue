@@ -14,6 +14,7 @@ const router = useRouter()
 const registerInfo = reactive({
   username: '',
   password: '',
+  passwordRepeat: ''
 })
 
 const isFormValid = ref(false)
@@ -21,7 +22,7 @@ const isFormValid = ref(false)
 // 输入验证
 const validateInput = () => {
   // 基本验证
-  isFormValid.value = !!(registerInfo.username && registerInfo.password);
+  isFormValid.value = !!(registerInfo.username && registerInfo.password && registerInfo.passwordRepeat);
 }
 
 const onSubmit = () => {
@@ -30,6 +31,10 @@ const onSubmit = () => {
 
 // 注册处理
 const handleRegister = async () => {
+  if(registerInfo.password != registerInfo.passwordRepeat) {
+    errorMessage("密码与确认密码不匹配，请检查后重新输入。")
+  }
+
   // 防止XSS攻击
   const xssPattern = /(~|{|}"|'|<|>|\?)/g
   if (xssPattern.test(registerInfo.username) || xssPattern.test(registerInfo.password)) {
@@ -98,6 +103,14 @@ onMounted(() => {
         <el-form-item label="密码">
           <el-input
             v-model="registerInfo.password"
+            type="password"
+            show-password
+            @input="validateInput"
+          />
+        </el-form-item>
+        <el-form-item label="确认密码">
+          <el-input
+            v-model="registerInfo.passwordRepeat"
             type="password"
             show-password
             @input="validateInput"
