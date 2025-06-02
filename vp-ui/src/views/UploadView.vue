@@ -136,12 +136,6 @@ async function upload(options: object) {
 function uploadSuccess(file: UploadFile) {
   file.inProgress = false
   file.percentage = 100.0
-  // apiClient.post<HttpResponse<object>, UploadCallback>('/api/oss/upload-callback', {
-  //   fileName: file.fileName,
-  //   fileUuid: file.fileUuid,
-  //   fileExtension: getFileExtension(file.fileName),
-  //   filePath: '/vp/source/'
-  // })
   setTimeout(() => {
     removeFromList(file)
   }, 5000)

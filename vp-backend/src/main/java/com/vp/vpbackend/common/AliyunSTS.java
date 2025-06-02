@@ -37,8 +37,6 @@ public class AliyunSTS {
             String regionId = "";
             // 添加endpoint。适用于Java SDK 3.12.0及以上版本。
             DefaultProfile.addEndpoint(regionId, "Sts", endpoint);
-            // 添加endpoint。适用于Java SDK 3.12.0以下版本。
-            // DefaultProfile.addEndpoint("",regionId, "Sts", endpoint);
             // 构造default profile。
             IClientProfile profile = DefaultProfile.getProfile(regionId, accessKeyId, accessKeySecret);
             // 构造client。
@@ -46,8 +44,6 @@ public class AliyunSTS {
             final AssumeRoleRequest request = new AssumeRoleRequest();
             // 适用于Java SDK 3.12.0及以上版本。
             request.setSysMethod(MethodType.POST);
-            // 适用于Java SDK 3.12.0以下版本。
-            // request.setMethod(MethodType.POST);
             request.setRoleArn(roleArn);
             request.setRoleSessionName(roleSessionName);
             request.setPolicy(policy);
