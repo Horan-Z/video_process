@@ -81,6 +81,6 @@ class HttpClient {
 }
 
 // 创建 API 实例
-const apiClient = new HttpClient('http://101.201.106.204:8080');
+const apiClient = new HttpClient(import.meta.env.VITE_HTTP_BASEURL as string);
 
 export default apiClient;

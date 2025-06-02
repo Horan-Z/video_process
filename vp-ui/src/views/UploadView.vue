@@ -19,12 +19,12 @@ interface UploadFile {
   client: OSS
 }
 
-interface UploadCallback {
-  fileName: string;
-  fileUuid: string;
-  fileExtension: string | undefined;
-  filePath: string;
-}
+// interface UploadCallback {
+//   fileName: string;
+//   fileUuid: string;
+//   fileExtension: string | undefined;
+//   filePath: string;
+// }
 
 interface Token {
   credentials: {
@@ -53,13 +53,13 @@ const headers = {
 async function createClient() {
   const token: Token = await fetchSTSToken()
   return new OSS({
-    region: 'oss-cn-beijing',
+    region: import.meta.env.VITE_OSS_REGION as string,
     accessKeyId: token.credentials.accessKeyId,
     accessKeySecret: token.credentials.accessKeySecret,
     stsToken: token.credentials.securityToken,
     // @ts-expect-error idk
     authorizationV4: true,
-    bucket: 'xiaoming10086',
+    bucket: import.meta.env.VITE_OSS_BUCKET as string,
     refreshSTSToken: async () => {
       const token: Token = await fetchSTSToken()
       return {
@@ -112,7 +112,7 @@ async function upload(options: object) {
       headers,
       callback: {
         // 设置回调请求的服务器地址，例如http://oss-demo.aliyuncs.com:23450。
-        url: "http://101.201.106.204:8080/api/oss/upload-callback",
+        url: import.meta.env.VITE_HTTP_BASEURL as string + "/api/oss/upload-callback",
         //（可选）设置回调请求消息头中Host的值，即您的服务器配置Host的值。
         //host: 'yourCallbackHost',
         // 设置发起回调时请求body的值。
@@ -141,12 +141,12 @@ async function upload(options: object) {
 function uploadSuccess(file: UploadFile) {
   file.inProgress = false
   file.percentage = 100.0
-  apiClient.post<HttpResponse<object>, UploadCallback>('/api/oss/upload-callback', {
-    fileName: file.fileName,
-    fileUuid: file.fileUuid,
-    fileExtension: getFileExtension(file.fileName),
-    filePath: '/vp/source/'
-  })
+  // apiClient.post<HttpResponse<object>, UploadCallback>('/api/oss/upload-callback', {
+  //   fileName: file.fileName,
+  //   fileUuid: file.fileUuid,
+  //   fileExtension: getFileExtension(file.fileName),
+  //   filePath: '/vp/source/'
+  // })
   setTimeout(() => {
     removeFromList(file)
   }, 5000)

@@ -1,7 +1,7 @@
-# 使用Alibaba Cloud Linux 3作为基础镜像
 FROM ubuntu:22.04
 
-LABEL authors="xiaoming10086"
+# 设置端口号
+ENV SPRING_PORT=8080
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV JAVA_VERSION=17 \
@@ -21,17 +21,13 @@ RUN apt-get update -y && \
     ./autogen.sh && \
     ./configure && \
     make && \
-    make install && \
-    cd && \
-    echo xiaoming10086:LTAI5t9T98FuQVWPBfVGDapB:WeudJ9iP5Gsqk82HW3umPtJIvULkSz > /etc/passwd-ossfs && \
-    chmod 640 /etc/passwd-ossfs && \
-    mkdir /tmp/ossfs
+    make install
 
 WORKDIR /app
 
 COPY target/vp-backend.jar app.jar
 
-EXPOSE 8080
+EXPOSE ${SPRING_PORT}
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

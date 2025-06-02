@@ -7,23 +7,31 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
+import com.vp.vpbackend.config.AliyunOssConfig;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@Component
+@RequiredArgsConstructor
 public class AliyunSTS {
-    public static AssumeRoleResponse getStsCredentials() {
+
+    private final AliyunOssConfig ossConfig;
+
+    public AssumeRoleResponse getStsCredentials() {
         // STS服务接入点，例如sts.cn-hangzhou.aliyuncs.com。您可以通过公网或者VPC接入STS服务。
-        String endpoint = "sts.cn-beijing.aliyuncs.com";
+        String endpoint = ossConfig.getEndpoint();
         // 从环境变量中获取步骤1.1生成的RAM用户的访问密钥（AccessKey ID和AccessKey Secret）。
-        String accessKeyId = "LTAI5t9T98FuQVWPBfVGDapB";
-        String accessKeySecret = "WeudJ9iP5Gsqk82HW3umPtJIvULkSz";
+        String accessKeyId = ossConfig.getAccessKeyId();
+        String accessKeySecret = ossConfig.getAccessKeySecret();
         // 从环境变量中获取步骤1.3生成的RAM角色的RamRoleArn。
-        String roleArn = "acs:ram::1926992707590548:role/sts";
+        String roleArn = ossConfig.getRoleArn();
         // 自定义角色会话名称，用来区分不同的令牌，例如可填写为SessionTest。
         String roleSessionName = "STSSession";
         // 临时访问凭证将获得角色拥有的所有权限。
         String policy = null;
         // 临时访问凭证的有效时间，单位为秒。最小值为900，最大值以当前角色设定的最大会话时间为准。当前角色最大会话时间取值范围为3600秒~43200秒，默认值为3600秒。
         // 在上传大文件或者其他较耗时的使用场景中，建议合理设置临时访问凭证的有效时间，确保在完成目标任务前无需反复调用STS服务以获取临时访问凭证。
-        Long durationSeconds = 900L;
+        Long durationSeconds = 3600L;
         try {
             // 发起STS请求所在的地域。建议保留默认值，默认值为空字符串（""）。
             String regionId = "";

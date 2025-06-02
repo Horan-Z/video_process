@@ -15,8 +15,10 @@ public class OssService {
 
     private final MediaProcessingService mediaProcessingService;
 
+    private final AliyunSTS aliyunSTS;
+
     public Result getSts() {
-        return new Result(200, "OK", AliyunSTS.getStsCredentials());
+        return new Result(200, "OK", aliyunSTS.getStsCredentials());
     }
 
     public Result registerUpload(UploadDTO uploadDTO) {

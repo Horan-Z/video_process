@@ -2,16 +2,16 @@ spring:
   application:
     name: vp-backend
   datasource:
-    username: root
-    password: root
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 #    url: jdbc:mysql://221.236.27.82:53306/video_process
 #    url: jdbc:mysql://db:3306/video_process
-    url: jdbc:mysql://101.201.106.204:53306/video_process
+    url: ${DB_URL}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 server:
   # 端口
-  port: 8080
+  port: ${VP_PORT}
 
 ############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
 sa-token:
@@ -29,3 +29,10 @@ sa-token:
   token-style: random-64
   # 是否输出操作日志
   is-log: true
+
+aliyun:
+  oss:
+    endpoint: ${OSS_ENDPOINT}
+    access-key-id: ${OSS_ACCESSKEYID}
+    access-key-secret: ${OSS_ACCESSKEYSECRET}
+    role-arn: ${OSS_ROLEARN}
