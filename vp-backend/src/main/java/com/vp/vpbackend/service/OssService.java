@@ -1,6 +1,5 @@
 package com.vp.vpbackend.service;
 
-import cn.dev33.satoken.stp.StpUtil;
 import com.vp.vpbackend.POJO.DO.FileDO;
 import com.vp.vpbackend.POJO.DTO.UploadDTO;
 import com.vp.vpbackend.POJO.Result;
@@ -29,7 +28,7 @@ public class OssService {
         fileDo.setFileUuid(uploadDTO.getFileUuid());
         fileDo.setFileExtension(uploadDTO.getFileExtension());
         fileDo.setFilePath(basePath + uploadDTO.getFilePath());
-        fileDo.setBelongTo(StpUtil.getLoginIdAsString());
+        fileDo.setBelongTo(uploadDTO.getUserUuid());
         fileDo.setCreateTime(LocalDateTime.now());
         fileDo.setLastUsedTime(LocalDateTime.now());
         fileDo.setFileType((short) 0);

@@ -74,7 +74,6 @@ async function createClient() {
 // 获取STS令牌
 async function fetchSTSToken(): Promise<Token> {
   const response: HttpResponse<Token> = await apiClient.get<HttpResponse<Token>>('/api/oss/sts')
-  console.log(response)
   return response.data
 }
 
@@ -100,8 +99,8 @@ async function upload(options: object) {
     })
     uploadFiles.value.push(newFile)
     newFile.ossObject = `/vp/source/${newFile.fileUuid}.${getFileExtension(newFile.fileName)}`
-    // const tokenName = localStorage.getItem('tokenName');
-    // const tokenValue = localStorage.getItem('tokenValue');
+    const tokenName = localStorage.getItem('tokenName');
+    const tokenValue = localStorage.getItem('tokenValue');
 
     const result = await newFile.client.multipartUpload(newFile.ossObject, newFile.file, {
       parallel: 1,
@@ -111,25 +110,26 @@ async function upload(options: object) {
         newFile.checkpoint = checkpoint
       },
       headers,
-      // callback: {
-      //   // 设置回调请求的服务器地址，例如http://oss-demo.aliyuncs.com:23450。
-      //   url: "http://101.201.106.204:8080/api/oss/upload-callback",
-      //   //（可选）设置回调请求消息头中Host的值，即您的服务器配置Host的值。
-      //   //host: 'yourCallbackHost',
-      //   // 设置发起回调时请求body的值。
-      //   body: "fileName=${x:fileName}&fileUuid=${x:fileUuid}&fileExtension=${x:fileExtension}&filePath=${x:filePath}",
-      //   // 设置发起回调请求的Content-Type。
-      //   contentType: "application/json",
-      //   customValue: {
-      //     fileName: newFile.fileName,
-      //     fileUuid: newFile.fileUuid,
-      //     fileExtension: getFileExtension(newFile.fileName),
-      //     filePath: '/vp/source/'
-      //   },
-      //   headers: {
-      //     [tokenName!]: tokenValue
-      //   }
-      // }
+      callback: {
+        // 设置回调请求的服务器地址，例如http://oss-demo.aliyuncs.com:23450。
+        url: "http://101.201.106.204:8080/api/oss/upload-callback",
+        //（可选）设置回调请求消息头中Host的值，即您的服务器配置Host的值。
+        //host: 'yourCallbackHost',
+        // 设置发起回调时请求body的值。
+        body: "fileName=${x:fileName}&fileUuid=${x:fileUuid}&fileExtension=${x:fileExtension}&filePath=${x:filePath}&userUuid=${x:userUuid}",
+        // 设置发起回调请求的Content-Type。
+        contentType: "application/x-www-form-urlencoded",
+        customValue: {
+          fileName: newFile.fileName,
+          fileUuid: newFile.fileUuid,
+          fileExtension: getFileExtension(newFile.fileName),
+          filePath: '/vp/source/',
+          userUuid: localStorage.getItem('userUuid')
+        },
+        headers: {
+          [tokenName!]: tokenValue
+        }
+      }
     })
     console.log('上传成功:', result)
     uploadSuccess(newFile)

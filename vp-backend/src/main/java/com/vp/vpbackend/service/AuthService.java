@@ -29,7 +29,7 @@ public class AuthService {
             return new Result(401, "用户名或密码错误", null);
         } else {
             StpUtil.login(user.getUuid());
-            return new Result(200, "Success", new AuthVO(user.getUsername(), StpUtil.getTokenInfo()));
+            return new Result(200, "Success", new AuthVO(user.getUsername(), user.getUuid(), StpUtil.getTokenInfo()));
         }
     }
 
@@ -39,10 +39,10 @@ public class AuthService {
         if (userMapper.selectCount(lqw) > 0) {
             return new Result(401, "用户名已存在", null);
         }
-        String hashedpassword = BCrypt.hashpw(authDTO.getPassword(), BCrypt.gensalt());
+        String hashedPassword = BCrypt.hashpw(authDTO.getPassword(), BCrypt.gensalt());
         UserDO user = new UserDO();
         user.setUsername(authDTO.getUsername());
-        user.setPassword(hashedpassword);
+        user.setPassword(hashedPassword);
         user.setCreateTime(LocalDateTime.now());
         user.setUpdateTime(LocalDateTime.now());
         user.setUuid(UUID.randomUUID().toString());

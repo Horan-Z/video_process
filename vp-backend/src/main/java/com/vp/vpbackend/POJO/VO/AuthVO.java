@@ -7,5 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class AuthVO {
     private String username;
+    private String uuid;
     private Object tokenInfo;
 }

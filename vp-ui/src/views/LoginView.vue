@@ -12,8 +12,17 @@ const loginInfo = reactive({
 })
 
 interface LoginRequest {
+  username: string
+  password: string
+}
+
+interface LoginResponseData {
   username: string;
-  password: string;
+  uuid: string;
+  tokenInfo: {
+    tokenName: string;
+    tokenValue: string;
+  }
 }
 
 const isFormValid = ref(false)
@@ -21,7 +30,7 @@ const isFormValid = ref(false)
 // 输入验证
 const validateInput = () => {
   // 基本验证
-  isFormValid.value = !!(loginInfo.username && loginInfo.password);
+  isFormValid.value = !!(loginInfo.username && loginInfo.password)
 }
 
 const onSubmit = () => {
@@ -38,14 +47,13 @@ const handleLogin = async () => {
   }
   try {
     // 使用示例
-    const response = await apiClient.post<HttpResponse<object>, LoginRequest>('/api/auth/login', {
+    const response = await apiClient.post<HttpResponse<LoginResponseData>, LoginRequest>('/api/auth/login', {
       username: loginInfo.username,
-      password: loginInfo.password
+      password: loginInfo.password,
     })
     if (response.code == 401) {
       errorMessage(response.msg)
     } else if (response.code == 200) {
-      console.log('登录成功')
       loginSuccess(response)
       // 跳转到主页
       await router.push('/')
@@ -59,13 +67,13 @@ const handleLogin = async () => {
   }
 }
 
-const loginSuccess = (response: HttpResponse<object>) => {
-  console.log(response)
+const loginSuccess = (response: HttpResponse<LoginResponseData>) => {
   localStorage.setItem('tokenName', response.data.tokenInfo.tokenName)
   localStorage.setItem('tokenValue', response.data.tokenInfo.tokenValue)
+  localStorage.setItem('userUuid', response.data.uuid)
   ElNotification({
     title: '登录成功',
-    message: `用户${response.data.username}已登录`,
+    message: `用户${response.data.uuid}已登录`,
     type: 'success',
   })
 }
@@ -82,7 +90,6 @@ const errorMessage = (text: string) => {
 onMounted(() => {
   validateInput()
 })
-
 </script>
 
 <template>
@@ -99,12 +106,23 @@ onMounted(() => {
         @submit.prevent="validateInput"
       >
         <el-form-item label="用户名">
-          <el-input v-model="loginInfo.username" type="text" @input="validateInput"/>
+          <el-input v-model="loginInfo.username" type="text" @input="validateInput" />
         </el-form-item>
         <el-form-item label="密码">
-          <el-input v-model="loginInfo.password" type="password" show-password @input="validateInput"/>
+          <el-input
+            v-model="loginInfo.password"
+            type="password"
+            show-password
+            @input="validateInput"
+          />
         </el-form-item>
-        <el-button type="primary" @click="onSubmit" round class="submit-btn" :disabled="!isFormValid">
+        <el-button
+          type="primary"
+          @click="onSubmit"
+          round
+          class="submit-btn"
+          :disabled="!isFormValid"
+        >
           <span>登录</span>
           <i class="arrow-icon"></i>
         </el-button>
@@ -118,7 +136,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-
 .login-wrapper {
   min-height: 93.5vh;
   display: flex;
@@ -195,5 +212,4 @@ onMounted(() => {
 .form-footer a:hover {
   text-decoration: underline;
 }
-
 </style>

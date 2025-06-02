@@ -41,7 +41,6 @@ const handleRegister = async () => {
       username: registerInfo.username,
       password: registerInfo.password,
     })
-    console.log(response.toString())
     if (response.code == 401) {
       errorMessage(response.msg)
     } else if (response.code == 200) {

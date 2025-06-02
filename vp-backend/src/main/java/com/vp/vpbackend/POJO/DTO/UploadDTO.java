@@ -12,4 +12,5 @@ public class UploadDTO {
     private String fileUuid;
     private String fileExtension;
     private String filePath;
+    private String userUuid;
 }

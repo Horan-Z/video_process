@@ -13,7 +13,6 @@ const router = createRouter({
 // 全局前置守卫
 router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('tokenValue')
-  console.log(isAuthenticated)
   if (to.meta.requiresAuth && !isAuthenticated) {
     next({ path: '/login' })
   } else {

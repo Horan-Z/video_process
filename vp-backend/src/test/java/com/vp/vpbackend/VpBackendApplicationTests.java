@@ -7,14 +7,13 @@ import com.github.kokorin.jaffree.ffprobe.Stream;
 import com.github.kokorin.jaffree.ffmpeg.UrlInput;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-
 import java.util.concurrent.atomic.AtomicLong;
 
 @SpringBootTest
 class VpBackendApplicationTests {
 
 	@Test
-	void contextLoads() {
+	void testJaffree() {
 		final AtomicLong durationMillis = new AtomicLong();
 		FFmpeg.atPath()
 				.addInput(
