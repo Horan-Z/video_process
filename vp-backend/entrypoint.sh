@@ -6,9 +6,12 @@ ACCESS_KEY_ID="LTAI********************"
 ACCESS_KEY_SECRET="ojSr**************************"
 
 echo "开始挂载OSS..."
+rm /etc/passwd-ossfs
 echo $BUCKET_NAME:$ACCESS_KEY_ID:$ACCESS_KEY_SECRET > /etc/passwd-ossfs
 chmod 640 /etc/passwd-ossfs
-mkdir /tmp/ossfs
+if [ ! -d /tmp/ossfs ]; then
+    mkdir /tmp/ossfs
+fi
 ossfs $BUCKET_NAME /tmp/ossfs -o url=http://$REGION.aliyuncs.com
 
 # 检查挂载是否成功

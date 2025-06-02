@@ -99,8 +99,6 @@ async function upload(options: object) {
     })
     uploadFiles.value.push(newFile)
     newFile.ossObject = `/vp/source/${newFile.fileUuid}.${getFileExtension(newFile.fileName)}`
-    const tokenName = localStorage.getItem('tokenName');
-    const tokenValue = localStorage.getItem('tokenValue');
 
     const result = await newFile.client.multipartUpload(newFile.ossObject, newFile.file, {
       parallel: 1,
@@ -125,9 +123,6 @@ async function upload(options: object) {
           fileExtension: getFileExtension(newFile.fileName),
           filePath: '/vp/source/',
           userUuid: localStorage.getItem('userUuid')
-        },
-        headers: {
-          [tokenName!]: tokenValue
         }
       }
     })
