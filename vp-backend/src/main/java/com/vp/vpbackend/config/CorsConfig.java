@@ -18,6 +18,8 @@ public class CorsConfig {
         // 允许所有 xiaoming10086.com 的子域名（HTTP 和 HTTPS）
         config.addAllowedOriginPattern("http://*.xiaoming10086.com");
         config.addAllowedOriginPattern("https://*.xiaoming10086.com");
+        // 允许任何域名
+        // config.addAllowedOriginPattern("*");
         // 允许任何请求头
         config.addAllowedHeader("*");
         // 允许任何方法（POST、GET等）
