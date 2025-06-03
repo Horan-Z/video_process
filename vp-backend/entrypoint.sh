@@ -1,21 +1,23 @@
 #!/bin/sh
 
-REGION="oss-cn-beijing"
+ENDPOINT="https://oss-cn-beijing-internal.aliyuncs.com"
 BUCKET_NAME="bucket_name"
 ACCESS_KEY_ID="LTAI********************"
 ACCESS_KEY_SECRET="ojSr**************************"
 
 echo "开始挂载OSS..."
-rm /etc/passwd-ossfs
-echo $BUCKET_NAME:$ACCESS_KEY_ID:$ACCESS_KEY_SECRET > /etc/passwd-ossfs
-chmod 640 /etc/passwd-ossfs
-if [ ! -d /tmp/ossfs ]; then
-    mkdir /tmp/ossfs
-fi
-ossfs $BUCKET_NAME /tmp/ossfs -o url=http://$REGION.aliyuncs.com
+rm -f /etc/ossfs2.conf
+echo "--oss_endpoint=$ENDPOINT" > /etc/ossfs2.conf
+echo "--oss_bucket=$BUCKET_NAME" >> /etc/ossfs2.conf
+echo "--oss_access_key_id=$ACCESS_KEY_ID" >> /etc/ossfs2.conf
+echo "--oss_access_key_secret=$ACCESS_KEY_SECRET" >> /etc/ossfs2.conf
+chmod 640 /etc/ossfs2.conf
+rm -rf /tmp/ossfs2-bucket
+mkdir /tmp/ossfs2-bucket
+ossfs2 mount /tmp/ossfs2-bucket/ -c /etc/ossfs2.conf
 
 # 检查挂载是否成功
-if mount | grep /tmp/ossfs > /dev/null; then
+if mount | grep /tmp/ossfs2-bucket > /dev/null; then
     echo "OSS挂载成功，准备启动Java应用..."
     java -jar /app/app.jar
 else

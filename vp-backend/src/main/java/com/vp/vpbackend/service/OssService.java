@@ -23,7 +23,7 @@ public class OssService {
 
     public Result registerUpload(UploadDTO uploadDTO) {
         FileDO fileDo = new FileDO();
-        final String basePath = "/tmp/ossfs";
+        final String basePath = "/tmp/ossfs2-bucket";
 
         // 设置基本文件信息
         fileDo.setFileName(uploadDTO.getFileName());

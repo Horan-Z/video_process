@@ -26,7 +26,7 @@ public class MediaProcessingService {
     @Async("mediaProcessingExecutor") // 指定使用的线程池
     public void processMedia(FileDO fileDo, UploadDTO uploadDTO) {
         try {
-            final String basePath = "/tmp/ossfs";
+            final String basePath = "/tmp/ossfs2-bucket";
 
             // 执行 FFmpeg 命令获取视频时长
             final AtomicLong durationMillis = new AtomicLong();
