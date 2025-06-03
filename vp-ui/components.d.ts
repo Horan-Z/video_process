@@ -16,6 +16,7 @@ declare module 'vue' {
     ElInput: typeof import('element-plus/es')['ElInput']
     ElMain: typeof import('element-plus/es')['ElMain']
     ElProgress: typeof import('element-plus/es')['ElProgress']
+    ElResult: typeof import('element-plus/es')['ElResult']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     IconFfmpeg: typeof import('./src/components/icons/IconFfmpeg.vue')['default']
     PageHeader: typeof import('./src/components/PageHeader.vue')['default']

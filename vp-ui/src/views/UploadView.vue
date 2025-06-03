@@ -19,13 +19,6 @@ interface UploadFile {
   client: OSS
 }
 
-// interface UploadCallback {
-//   fileName: string;
-//   fileUuid: string;
-//   fileExtension: string | undefined;
-//   filePath: string;
-// }
-
 interface Token {
   credentials: {
     accessKeyId: string

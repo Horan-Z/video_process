@@ -5,22 +5,22 @@ const routes = [
   {
     path: '/',
     component: Upload,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, keepAlive: true },
   },
   {
     path: '/upload',
     component: Upload,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, keepAlive: true },
   },
   {
     path: '/register',
     component: () => import('@/views/RegisterView.vue'),
-    meta: { requiresAuth: false },
+    meta: { requiresAuth: false, keepAlive: false },
   },
   {
     path: '/login',
     component: Login,
-    meta: { requiresAuth: false },
+    meta: { requiresAuth: false, keepAlive: false },
   },
   {
     path: '/:pathMatch(.*)*', // 404页面
