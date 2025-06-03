@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
 import java.util.concurrent.atomic.AtomicLong;
 
 @Service
@@ -49,7 +50,7 @@ public class MediaProcessingService {
 
             // 解析视频流信息
             for (Stream stream : result.getStreams()) {
-                if("video".equalsIgnoreCase(stream.getCodecType().toString())) {
+                if ("video".equalsIgnoreCase(stream.getCodecType().toString())) {
                     fileDo.setVideoCodec(stream.getCodecName());
                     break;
                 }

@@ -10,8 +10,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @MapperScan("com.vp.vpbackend.mapper")
 public class VpBackendApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(VpBackendApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(VpBackendApplication.class, args);
+    }
 
 }

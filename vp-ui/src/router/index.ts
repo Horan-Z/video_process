@@ -7,7 +7,7 @@ const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
     // 控制滚动行为
     return savedPosition || { top: 0 }
-  }
+  },
 })
 
 // 全局前置守卫

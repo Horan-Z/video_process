@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import apiClient from '@/api/httpClient.ts'
 import { useRouter } from 'vue-router'
-import { ref, onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import IconFfmpeg from '@/components/icons/IconFfmpeg.vue'
 
 const router = useRouter()
@@ -23,7 +23,7 @@ function logout() {
   localStorage.clear()
   apiClient.post('/api/auth/logout', {
     tokenName: tokenName,
-    tokenValue: tokenValue
+    tokenValue: tokenValue,
   })
   router.push('/login')
 }
@@ -37,7 +37,9 @@ function logout() {
         <span class="title-text">FFmpeg Online</span>
       </div>
       <div class="right-content">
-        <el-button type="primary" v-show="!isLoggedIn" @click="router.push('/login')">登录</el-button>
+        <el-button type="primary" v-show="!isLoggedIn" @click="router.push('/login')"
+          >登录
+        </el-button>
         <el-button type="danger" plain v-show="isLoggedIn" @click="logout">注销</el-button>
       </div>
     </div>

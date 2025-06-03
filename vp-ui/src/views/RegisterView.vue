@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import apiClient from '@/api/httpClient.ts'
 import type { HttpResponse } from '@/types/Response'
 import { ElNotification } from 'element-plus'
 
 interface RegisterRequest {
-  username: string;
-  password: string;
+  username: string
+  password: string
 }
 
 const router = useRouter()
 const registerInfo = reactive({
   username: '',
   password: '',
-  passwordRepeat: ''
+  passwordRepeat: '',
 })
 
 const isFormValid = ref(false)
@@ -22,7 +22,11 @@ const isFormValid = ref(false)
 // 输入验证
 const validateInput = () => {
   // 基本验证
-  isFormValid.value = !!(registerInfo.username && registerInfo.password && registerInfo.passwordRepeat);
+  isFormValid.value = !!(
+    registerInfo.username &&
+    registerInfo.password &&
+    registerInfo.passwordRepeat
+  )
 }
 
 const onSubmit = () => {
@@ -31,8 +35,8 @@ const onSubmit = () => {
 
 // 注册处理
 const handleRegister = async () => {
-  if(registerInfo.password != registerInfo.passwordRepeat) {
-    errorMessage("密码与确认密码不匹配，请检查后重新输入。")
+  if (registerInfo.password != registerInfo.passwordRepeat) {
+    errorMessage('密码与确认密码不匹配，请检查后重新输入。')
   }
 
   // 防止XSS攻击
@@ -42,7 +46,10 @@ const handleRegister = async () => {
     return
   }
   try {
-    const response: HttpResponse<object> = await apiClient.post<HttpResponse<object>, RegisterRequest>('/api/auth/register', {
+    const response: HttpResponse<object> = await apiClient.post<
+      HttpResponse<object>,
+      RegisterRequest
+    >('/api/auth/register', {
       username: registerInfo.username,
       password: registerInfo.password,
     })

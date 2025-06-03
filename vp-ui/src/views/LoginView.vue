@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import apiClient from '@/api/httpClient.ts'
 import type { HttpResponse } from '@/types/Response'
@@ -17,11 +17,11 @@ interface LoginRequest {
 }
 
 interface LoginResponseData {
-  username: string;
-  uuid: string;
+  username: string
+  uuid: string
   tokenInfo: {
-    tokenName: string;
-    tokenValue: string;
+    tokenName: string
+    tokenValue: string
   }
 }
 
@@ -47,10 +47,13 @@ const handleLogin = async () => {
   }
   try {
     // 使用示例
-    const response = await apiClient.post<HttpResponse<LoginResponseData>, LoginRequest>('/api/auth/login', {
-      username: loginInfo.username,
-      password: loginInfo.password,
-    })
+    const response = await apiClient.post<HttpResponse<LoginResponseData>, LoginRequest>(
+      '/api/auth/login',
+      {
+        username: loginInfo.username,
+        password: loginInfo.password,
+      },
+    )
     if (response.code == 401) {
       errorMessage(response.msg)
     } else if (response.code == 200) {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { UploadFilled, Delete, Check } from '@element-plus/icons-vue'
+import { Check, Delete, UploadFilled } from '@element-plus/icons-vue'
 import apiClient from '@/api/httpClient.ts'
 import type { HttpResponse } from '@/types/Response'
 import { reactive, ref } from 'vue'
@@ -28,8 +28,8 @@ interface UploadFile {
 
 interface Token {
   credentials: {
-    accessKeyId: string;
-    accessKeySecret: string;
+    accessKeyId: string
+    accessKeySecret: string
     securityToken: string
   }
 }
@@ -110,21 +110,21 @@ async function upload(options: object) {
       headers,
       callback: {
         // 设置回调请求的服务器地址，例如http://oss-demo.aliyuncs.com:23450。
-        url: import.meta.env.VITE_HTTP_BASEURL as string + "/api/oss/upload-callback",
+        url: (import.meta.env.VITE_HTTP_BASEURL as string) + '/api/oss/upload-callback',
         //（可选）设置回调请求消息头中Host的值，即您的服务器配置Host的值。
         //host: 'yourCallbackHost',
         // 设置发起回调时请求body的值。
-        body: "fileName=${x:fileName}&fileUuid=${x:fileUuid}&fileExtension=${x:fileExtension}&filePath=${x:filePath}&userUuid=${x:userUuid}",
+        body: 'fileName=${x:fileName}&fileUuid=${x:fileUuid}&fileExtension=${x:fileExtension}&filePath=${x:filePath}&userUuid=${x:userUuid}',
         // 设置发起回调请求的Content-Type。
-        contentType: "application/x-www-form-urlencoded",
+        contentType: 'application/x-www-form-urlencoded',
         customValue: {
           fileName: newFile.fileName,
           fileUuid: newFile.fileUuid,
           fileExtension: getFileExtension(newFile.fileName),
           filePath: '/vp/source/',
-          userUuid: localStorage.getItem('userUuid')
-        }
-      }
+          userUuid: localStorage.getItem('userUuid'),
+        },
+      },
     })
     console.log('上传成功:', result)
     uploadSuccess(newFile)
@@ -177,7 +177,9 @@ function removeFromList(file: UploadFile) {
       auto-upload
       v-show="true"
     >
-      <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+      <el-icon class="el-icon--upload">
+        <upload-filled />
+      </el-icon>
       <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
       <div class="el-upload__text">最大文件大小2GB</div>
     </el-upload>

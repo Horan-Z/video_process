@@ -4,8 +4,8 @@ spring:
   datasource:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-#    url: jdbc:mysql://221.236.27.82:53306/video_process
-#    url: jdbc:mysql://db:3306/video_process
+    #    url: jdbc:mysql://221.236.27.82:53306/video_process
+    #    url: jdbc:mysql://db:3306/video_process
     url: ${DB_URL}
     driver-class-name: com.mysql.cj.jdbc.Driver
 

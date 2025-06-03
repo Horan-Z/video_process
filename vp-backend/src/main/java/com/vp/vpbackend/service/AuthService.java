@@ -1,5 +1,6 @@
 package com.vp.vpbackend.service;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.vp.vpbackend.POJO.DO.UserDO;
 import com.vp.vpbackend.POJO.DTO.AuthDTO;
@@ -10,7 +11,6 @@ import com.vp.vpbackend.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
-import cn.dev33.satoken.stp.StpUtil;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -56,7 +56,7 @@ public class AuthService {
     }
 
     public Result checkLogin() {
-        if(StpUtil.isLogin()) {
+        if (StpUtil.isLogin()) {
             return new Result(200, "Yes", null);
         } else {
             return new Result(401, "No", null);

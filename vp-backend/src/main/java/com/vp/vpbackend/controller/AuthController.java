@@ -1,11 +1,14 @@
 package com.vp.vpbackend.controller;
 
+import com.vp.vpbackend.POJO.DTO.AuthDTO;
 import com.vp.vpbackend.POJO.DTO.TokenDTO;
 import com.vp.vpbackend.POJO.Result;
-import com.vp.vpbackend.POJO.DTO.AuthDTO;
 import com.vp.vpbackend.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
