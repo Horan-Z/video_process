@@ -174,7 +174,7 @@ function removeFromList(file: UploadFile) {
         <upload-filled />
       </el-icon>
       <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
-      <div class="el-upload__text">最大文件大小2GB</div>
+      <!--      <div class="el-upload__text">最大文件大小2GB</div>-->
     </el-upload>
 
     <div class="progress" v-for="file in uploadFiles" :key="file.fileUuid">

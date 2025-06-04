@@ -1,5 +1,6 @@
 #!/bin/sh
 
+#如果要用外网访问就去掉 -internal
 ENDPOINT="https://oss-cn-beijing-internal.aliyuncs.com"
 BUCKET_NAME="bucket_name"
 ACCESS_KEY_ID="LTAI********************"
