@@ -34,7 +34,7 @@ public class DataSync {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         env.setParallelism(1); // 设置并行度，可根据集群资源调整
-        env.enableCheckpointing(5000); // 启用检查点，间隔 5 秒
+        env.enableCheckpointing(3000); // 启用检查点，间隔 3 秒
 
         // 创建表执行环境
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);

@@ -129,7 +129,7 @@ function handleSelect(row: rowObject) {
   selected.value = row.id
 }
 
-const debouncedSearch = useDebounceFn(fetchData, 500)
+const debouncedSearch = useDebounceFn(fetchData, 0)
 
 function handleInput() {
   refreshPage.value = true
@@ -165,11 +165,11 @@ async function handleSort(data: { column: never; prop: string; order: never }) {
       <el-table-column type="expand">
         <template #default="props">
           <div style="margin-left: 60px">
-            <p>文件大小: {{ (props.row.fileSizeBytes / 1024).toFixed(2) }} MB</p>
+            <p>文件大小: {{ (props.row.fileSizeBytes / 1048576).toFixed(2) }} MB</p>
             <p>视频编码格式: {{ props.row.videoCodec }}</p>
             <p>视频封装格式: {{ props.row.videoFormat }}</p>
             <p>视频时长: {{ videoDuration(props.row.videoDurationMillis) }}</p>
-            <p>视频比特率: {{ props.row.videoBitrate / 1000 }} Mbps</p>
+            <p>视频比特率: {{ (props.row.videoBitrate / 1000000).toFixed(2) }} Mbps</p>
           </div>
         </template>
       </el-table-column>

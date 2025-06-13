@@ -1,4 +1,4 @@
-curl -X PUT "http://172.19.1.56:9200/file_index" -H "Content-Type: application/json" -d '{
+curl -X PUT "http://localhost:9200/file_index" -H "Content-Type: application/json" -d '{
   "settings": {
     "analysis": {
       "analyzer": {

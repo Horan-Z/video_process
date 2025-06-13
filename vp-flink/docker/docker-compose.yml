@@ -1,7 +1,8 @@
-version: "2.2"
+version: "3.5"
 services:
   jobmanager:
     image: flink:1.20.1-java17
+    restart: unless-stopped
     ports:
       - "8081:8081"
     command: jobmanager
@@ -12,12 +13,33 @@ services:
 
   taskmanager:
     image: flink:1.20.1-java17
+    restart: unless-stopped
     depends_on:
       - jobmanager
     command: taskmanager
-    scale: 1
     environment:
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
         taskmanager.numberOfTaskSlots: 2
+
+  elasticsearch:
+    image: elasticsearch:7.17.28
+    container_name: elasticsearch
+    restart: unless-stopped
+    ports:
+      - "19200:9200"
+      - "9300:9300"
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms2G -Xmx2G"
+      bootstrap.memory_lock: "true"
+      http.cors.enabled: "true"
+      http.cors.allow-origin: "*"
+    networks:
+      - es_network
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
