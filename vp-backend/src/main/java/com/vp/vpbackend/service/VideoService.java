@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 public class VideoService {
 
     private final FileMapper fileMapper;
+    private final OssService ossService;
 
     public Result getList(GetListDTO getListDTO) {
         LambdaQueryWrapper<FileDO> lqw = new LambdaQueryWrapper<>();
@@ -45,8 +46,11 @@ public class VideoService {
             return new Result(400, "文件不存在或无权删除", null);
         } else {
             fileMapper.deleteById(id);
-            // TODO OSS文件删除
-            return new Result(200, "success", null);
+            if (ossService.delOssObject(file.getFilePath() + file.getFileUuid() + "." + file.getFileExtension())) {
+                return new Result(200, "success", null);
+            } else {
+                return new Result(400, "failed", null);
+            }
         }
     }
 }

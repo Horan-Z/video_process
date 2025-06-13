@@ -7,6 +7,9 @@ import com.vp.vpbackend.common.AliyunSTS;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
 @Service
@@ -46,5 +49,14 @@ public class OssService {
         System.out.println("Async");
         // 立即返回结果，不等待媒体处理完成
         return new Result(200, "OK", fileDo);
+    }
+
+    public boolean delOssObject(String filePath) {
+        try {
+            return Files.deleteIfExists(Paths.get(filePath));
+        } catch (IOException e) {
+            System.err.println("删除文件时发生错误: " + e.getMessage());
+            return false;
+        }
     }
 }
