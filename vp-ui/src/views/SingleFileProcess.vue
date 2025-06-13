@@ -13,7 +13,6 @@ const search = ref('')
 const tableData = ref([])
 const pageNumber = ref(1)
 const pageSize = ref(10)
-// TODO 搜索排序
 const sortType = ref('NAME_ASC')
 const totalCount = ref(1)
 const selected = ref(0)
@@ -56,16 +55,38 @@ async function fetchData() {
     tableData.value = res.data.page.records
   } else {
     console.log(`searching: ${search.value}`)
+    // 构建排序参数
+    const sortParams = []
+
+    // 根据 sortType.value 设置排序参数
+    switch (sortType.value) {
+      case 'NAME_ASC':
+        sortParams.push({ 'file_name.keyword': { order: 'asc' } })
+        break
+      case 'NAME_DESC':
+        sortParams.push({ 'file_name.keyword': { order: 'desc' } })
+        break
+      case 'CREATED_TIME_ASC':
+        sortParams.push({ 'create_time.keyword': { order: 'asc' } })
+        break
+      case 'CREATED_TIME_DESC':
+        sortParams.push({ 'create_time.keyword': { order: 'desc' } })
+        break
+      default:
+        break
+    }
+
     const res = await axios.post(
       `${import.meta.env.VITE_ES_BASEURL as string}/file_index/_search`,
       {
         query: {
           match_phrase: {
-            file_name: `${search.value}`,
+            file_name: search.value,
           },
         },
         from: 10 * (pageNumber.value - 1),
         size: 10,
+        sort: sortParams,
       },
       {
         headers: {
@@ -73,7 +94,6 @@ async function fetchData() {
         },
       },
     )
-    console.log(res)
     totalCount.value = res.data.hits.total.value
     // @ts-expect-error it does
     const sourceData = res.data.hits.hits.map((hit: object) => hit._source)
@@ -120,13 +140,28 @@ async function handleDelete(row: rowObject) {
   await apiClient.delete(`/video/${row.id}`)
   await fetchData()
 }
+
+async function handleSort(data: { column: never; prop: string; order: never }) {
+  if (data.prop === 'fileName' && data.order === 'ascending') sortType.value = 'NAME_ASC'
+  if (data.prop === 'fileName' && data.order === 'descending') sortType.value = 'NAME_DESC'
+  if (data.prop === 'createTime' && data.order === 'ascending') sortType.value = 'CREATED_TIME_ASC'
+  if (data.prop === 'createTime' && data.order === 'descending')
+    sortType.value = 'CREATED_TIME_DESC'
+  await fetchData()
+}
 </script>
 
 <template>
   <page-header />
   <template v-if="step == 1">
     <h2 class="step">第一步: 选择视频</h2>
-    <el-table :data="tableData" :border="false" :preserve-expanded-content="false" class="table">
+    <el-table
+      :data="tableData"
+      @sort-change="handleSort"
+      :border="false"
+      :preserve-expanded-content="false"
+      class="table"
+    >
       <el-table-column type="expand">
         <template #default="props">
           <div style="margin-left: 60px">
@@ -138,8 +173,13 @@ async function handleDelete(row: rowObject) {
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="添加日期" prop="createTime" :formatter="formatDate" />
-      <el-table-column label="文件名" prop="fileName" />
+      <el-table-column
+        label="添加日期"
+        prop="createTime"
+        :formatter="formatDate"
+        sortable="custom"
+      />
+      <el-table-column label="文件名" prop="fileName" sortable="custom" />
       <el-table-column align="right">
         <template #header>
           <el-input
