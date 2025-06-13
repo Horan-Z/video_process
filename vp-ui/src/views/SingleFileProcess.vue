@@ -4,15 +4,20 @@ import { onMounted, ref } from 'vue'
 import apiClient from '@/api/httpClient.ts'
 import type { HttpResponse } from '@/types/Response'
 import { format } from 'date-fns'
+import axios from 'axios'
+import _ from 'lodash'
+import { useDebounceFn } from '@vueuse/core'
 
 const step = ref(1)
 const search = ref('')
 const tableData = ref([])
 const pageNumber = ref(1)
 const pageSize = ref(10)
+// TODO 搜索排序
 const sortType = ref('NAME_ASC')
 const totalCount = ref(1)
 const selected = ref(0)
+const refreshPage = ref(false)
 
 interface listData {
   count: number
@@ -25,12 +30,56 @@ interface rowObject {
   id: number
 }
 
+function snakeToCamelLodash(obj: object): object {
+  if (Array.isArray(obj)) {
+    return obj.map((item) => snakeToCamelLodash(item))
+  } else if (obj !== null && typeof obj === 'object') {
+    return Object.keys(obj).reduce((result, key) => {
+      // @ts-expect-error idk
+      result[_.camelCase(key)] = snakeToCamelLodash(obj[key])
+      return result
+    }, {})
+  }
+  return obj
+}
+
 async function fetchData() {
-  const res = await apiClient.get<HttpResponse<listData>>(
-    `/video/list?pageNum=${pageNumber.value}&pageSize=${pageSize.value}&sortType=${sortType.value}`,
-  )
-  totalCount.value = res.data.count
-  tableData.value = res.data.page.records
+  if (refreshPage.value) {
+    pageNumber.value = 1
+    refreshPage.value = false
+  }
+  if (search.value == '') {
+    const res = await apiClient.get<HttpResponse<listData>>(
+      `/video/list?pageNum=${pageNumber.value}&pageSize=${pageSize.value}&sortType=${sortType.value}`,
+    )
+    totalCount.value = res.data.count
+    tableData.value = res.data.page.records
+  } else {
+    console.log(`searching: ${search.value}`)
+    const res = await axios.post(
+      `${import.meta.env.VITE_ES_BASEURL as string}/file_index/_search`,
+      {
+        query: {
+          match_phrase: {
+            file_name: `${search.value}`,
+          },
+        },
+        from: 10 * (pageNumber.value - 1),
+        size: 10,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+    console.log(res)
+    totalCount.value = res.data.hits.total.value
+    // @ts-expect-error it does
+    const sourceData = res.data.hits.hits.map((hit: object) => hit._source)
+    // @ts-expect-error idk
+    tableData.value = snakeToCamelLodash(sourceData)
+  }
 }
 
 onMounted(() => {
@@ -58,6 +107,13 @@ function changePage(page: number) {
 
 function handleSelect(row: rowObject) {
   selected.value = row.id
+}
+
+const debouncedSearch = useDebounceFn(fetchData, 500)
+
+function handleInput() {
+  refreshPage.value = true
+  debouncedSearch()
 }
 
 async function handleDelete(row: rowObject) {
@@ -89,7 +145,9 @@ async function handleDelete(row: rowObject) {
           <el-input
             v-model="search"
             size="small"
-            placeholder="文件名模糊查找(还没做,准备用es实现)"
+            placeholder="文件名模糊查找"
+            clearable
+            @input="handleInput"
           />
         </template>
         <template #default="scope">
@@ -106,6 +164,7 @@ async function handleDelete(row: rowObject) {
         :page-size="pageSize"
         :pager-count="7"
         :total="totalCount"
+        :current-page="pageNumber"
         @current-change="changePage"
       />
     </div>
